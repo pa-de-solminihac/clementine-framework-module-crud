@@ -83,7 +83,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 break;
                             case 'file':
 ?>
-    <input type="hidden" id="<?php echo $field_class; ?>-hidden" name="<?php echo $field_class; ?>-hidden" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-hidden" value="<?php echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $htmlval); ?>" />
+    <input type="hidden" id="<?php echo $field_class; ?>-hidden" name="<?php echo $field_class; ?>-hidden" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-hidden" value="<?php echo $htmlval; ?>" />
     <span id="<?php echo $field_class; ?>-uplcontainer" class="clementine_crud-plupload_container">
         <input type="file" id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>" />
     </span>

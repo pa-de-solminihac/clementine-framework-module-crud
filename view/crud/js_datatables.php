@@ -18,6 +18,7 @@ if (Clementine::$config['module_jstools']['nb_res_datatables']) {
                 ?>
                 "aaSorting": [], /* disable initial sort */
                 "sPaginationType": "full_numbers",
+                "bProcessing": true,
                 "bServerSide": true,
                 "sAjaxSource": "<?php echo $request->EQUIV[$request->LANG]; ?>",
                 "sServerMethod": "GET",
