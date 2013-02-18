@@ -20,6 +20,23 @@ if (Clementine::$config['module_jstools']['nb_res_datatables']) {
                 "sPaginationType": "full_numbers",
                 "bProcessing": true,
                 "bServerSide": true,
+                "fnServerData": function (sSource, aoData, fnCallback, oSettings) {
+                    oSettings.jqXHR = jQuery.ajax({
+                        "dataType": 'json',
+                        "type": "GET",
+                        "url": sSource,
+                        "data": aoData,
+                        "success": fnCallback,
+                        "error": function (xhr, textStatus, error) {
+                            if (textStatus === 'timeout') {
+                                alert('The server took too long to send the data.');
+                            } else {
+                                alert('An error occurred on the server. Please check that your are still connected to your account.');
+                            }
+                            myDataTable.fnProcessingIndicator(false);
+                        }
+                    }); 
+                },
                 "sAjaxSource": "<?php echo $request->EQUIV[$request->LANG]; ?>",
                 "sServerMethod": "GET",
                 "iDisplayLength": 10,
