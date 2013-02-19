@@ -75,15 +75,7 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                             }
                             msg = info.response;
                             var retval = msg.substring(0, 1);
-                            if (retval == '1') {
-                                alert(msg.substring(1));
-                                jQuery('#<?php echo $browsebutton; ?>-after').html('erreur');
-                                jQuery('#<?php echo $browsebutton; ?>-after').attr('href', '');
-                                retour = 0;
-                            } else if (retval == '2') {
-                                document.location = msg.substring(1);
-                                retour = 0;
-                            } else {
+                            if (retval == '0') {
                                 var noms = msg.substring(1).split(':');
                                 var temp_name = noms[0];
                                 var orig_name = noms[1];
@@ -101,6 +93,21 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                                 if ((plupload_crudform.data('automatic_submit') != undefined) && (plupload_crudform.data('automatic_submit') == true)) {
                                     plupload_crudform.submit();
                                 }
+                            } else if (retval == '2') {
+                                document.location = msg.substring(1);
+                                retour = 0;
+                            } else if (retval == '1') {
+                                // retval == 1 : erreur gérée
+                                alert(msg.substring(1));
+                                jQuery('#<?php echo $browsebutton; ?>-after').html('erreur');
+                                jQuery('#<?php echo $browsebutton; ?>-after').attr('href', '');
+                                retour = 0;
+                            } else {
+                                // erreur inattendue
+                                alert('Erreur lors du transfert du fichier. Session expirée ?');
+                                jQuery('#<?php echo $browsebutton; ?>-after').html('erreur');
+                                jQuery('#<?php echo $browsebutton; ?>-after').attr('href', '');
+                                retour = 0;
                             }
                         },
                         Error: function(up, err) {
