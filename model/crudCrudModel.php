@@ -456,7 +456,7 @@ class crudCrudModel extends crudCrudModel_Parent
             $PK = array();
             foreach ($this->metas['primary_key'] as $table => $keys) {
                 foreach ($keys as $key => $type) {
-                    $PK[$table . '.' . $key] = '';
+                    $PK[$table . '-' . $key] = '';
                 }
             }
             $PK_filled = array();
@@ -788,14 +788,14 @@ class crudCrudModel extends crudCrudModel_Parent
                         if (count($group_by)) {
                             $this->group_by = array_merge($this->group_by, $group_by);
                         } else {
-                            $backtrace = debug_backtrace(false);
+                            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                             $err_msg = "You need a 'group by' if you want to use 'left join' for table `$table` (but none could be found automaticaly) ";
                             echo "<br />\n" . '<strong>Clementine fatal error</strong>: ' . htmlentities($err_msg, ENT_COMPAT, mb_internal_encoding()) . ' in <strong>' . $backtrace[0]['file'] . '</strong> on line <strong>' . $backtrace[0]['line'] . '</strong>' . "<br />\n" . '<br />';
                             die();
                         }
                     }
                 } else {
-                    $backtrace = debug_backtrace(false);
+                    $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                     $err_msg = "'left join' is only available for readonly_tables at the moment, and `$table` is not registered as one of them ";
                     echo "<br />\n" . '<strong>Clementine fatal error</strong>: ' . htmlentities($err_msg, ENT_COMPAT, mb_internal_encoding()) . ' in <strong>' . $backtrace[0]['file'] . '</strong> on line <strong>' . $backtrace[0]['line'] . '</strong>' . "<br />\n" . '<br />';
                     die();
