@@ -247,7 +247,7 @@ class crudCrudModel extends crudCrudModel_Parent
         if (isset($params['order_by'])) {
             $sql .= "\nORDER BY " . $params['order_by'] . ' ';
         }
-        if (isset($params['limit'])) {
+        if (!empty($params['limit'])) {
             $sql .= "\nLIMIT " . $params['limit'] . ' ';
         }
         $result = array();
@@ -743,7 +743,7 @@ class crudCrudModel extends crudCrudModel_Parent
         }
         // ajoute les champs de custom_fields au SELECT généré
         foreach ($this->metas['custom_fields'] as $alias => $custom_field) {
-            $select_fields .= "\n    " . $custom_field . ' AS ' . $alias . ', ';
+            $select_fields .= "\n    " . $custom_field . ' AS "' . $alias . '", ';
         }
         $select_fields = $ns->substr($select_fields, 0, -2);
         $sql = 'SELECT ';

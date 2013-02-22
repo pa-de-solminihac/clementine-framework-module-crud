@@ -97,6 +97,16 @@ class crudCrudController extends crudCrudController_Parent
         $this->move_fields_index($params);
         $this->rename_fields($params);
         $this->rename_fields_index($params);
+        // export XLS si on ajoute dans l'URL &export_xls&sEcho=1
+        if (isset($params['get']['export_xls'])) {
+            $this->data['export_xls'] = 1;
+            $this->data['return_json'] = 1;
+            if (!defined('__NO_DEBUG_DIV__')) {
+                define ('__NO_DEBUG_DIV__', true);
+            }
+            $params['limit'] = false;
+            $params['sql_calc_found_rows'] = false;
+        }
         // paging
         if (isset($params['get']['iDisplayStart'])) {
             $this->data['return_json'] = 1;
@@ -203,9 +213,12 @@ class crudCrudController extends crudCrudController_Parent
         } else {
             $this->data['nb_total_values'] = count($this->data['values']);
         }
-        // par défaut, on masque le bouton dupliquer
+        // par défaut, on masque les boutons dupliquer et XLS
         if (!isset($this->data['hidden_sections']['duplicatebutton'])) {
             $this->hideSection('duplicatebutton');
+        }
+        if (!isset($this->data['hidden_sections']['xlsbutton'])) {
+            $this->hideSection('xlsbutton');
         }
         $this->alter_values($params);
         $this->alter_values_index($params);
