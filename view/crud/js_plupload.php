@@ -22,7 +22,7 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                 if (formurl.indexOf('?') == -1) {
                     formurl += '?';
                 }
-                var uploader_<?php echo $rand; ?> = new plupload.Uploader({
+                uploader_<?php echo $rand; ?> = new plupload.Uploader({
                     runtimes : 'html5,flash,html4',
                     flash_swf_url : '<?php echo __WWW_ROOT_JSTOOLS__; ?>/skin/plupload/plupload.flash.swf',
                     browse_button : '<?php echo $browsebutton; ?>',
@@ -55,6 +55,8 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                             if (!jQuery('#<?php echo $browsebutton; ?>-after').length) {
                                 jQuery('#<?php echo $browsebutton; ?>').after(' <a href="" id="<?php echo $browsebutton; ?>-after" class="plupload_finished" />');
                             }
+                            jQuery('#<?php echo $browsebutton; ?>-after').html("en cours");
+                            jQuery('#<?php echo $browsebutton; ?>-after').attr('href', '');
                             pending_uploads = 1;
                             if (plupload_crudform.data('pending_uploads') != undefined) {
                                 pending_uploads = parseInt(plupload_crudform.data('pending_uploads')) + 1;
@@ -90,6 +92,8 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                                 jQuery('#<?php echo $browsebutton; ?>').css('visibility', 'hidden');
                                 jQuery('#<?php echo $browsebutton; ?>-uplcontainer > .plupload:first').css('position', 'absolute');
                                 jQuery('#<?php echo $browsebutton; ?>-uplcontainer > .plupload:first').css('zIndex', '-2');
+                                jQuery('#<?php echo $browsebutton; ?>-uplcontainer > form:first').css('position', 'absolute');
+                                jQuery('#<?php echo $browsebutton; ?>-uplcontainer > form:first').css('zIndex', '-2');
                                 if ((plupload_crudform.data('automatic_submit') != undefined) && (plupload_crudform.data('automatic_submit') == true)) {
                                     plupload_crudform.submit();
                                 }
@@ -115,7 +119,11 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                         }
                     }
                 });
-                uploader_<?php echo $rand; ?>.init();
+                jQuery('#<?php echo $browsebutton; ?>').hover(function () {
+                    jQuery('#<?php echo $browsebutton; ?>').unbind('hover');
+                    uploader_<?php echo $rand; ?>.init();
+                    return false;
+                });
             }
 <?php
     }
@@ -158,10 +166,13 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                                             jQuery('#' + dom_file_elem).css('position', 'relative');
                                             jQuery('#' + dom_file_elem).css('zIndex', '1');
                                             jQuery('#' + dom_file_elem + '-uplcontainer > .plupload:first').css('position', 'absolute');
-                                            if (jQuery('#' + dom_file_elem + '-uplcontainer > .plupload:first').hasClass('flash')) {
+                                            jQuery('#' + dom_file_elem + '-uplcontainer > form:first').css('position', 'absolute');
+                                            if (jQuery('#' + dom_file_elem + '-uplcontainer > .plupload:first').hasClass('flash') || jQuery('#' + dom_file_elem + '-uplcontainer > form:first').hasClass('flash')) {
                                                 jQuery('#' + dom_file_elem + '-uplcontainer > .plupload:first').css('zIndex', '2');
+                                                jQuery('#' + dom_file_elem + '-uplcontainer > form:first').css('zIndex', '2');
                                             } else {
                                                 jQuery('#' + dom_file_elem + '-uplcontainer > .plupload:first').css('zIndex', '0');
+                                                jQuery('#' + dom_file_elem + '-uplcontainer > form:first').css('zIndex', '0');
                                             }
                                             jQuery('#' + dom_file_elem + '-infoscontainer').show();
                                             // transmision du nom de fichier
@@ -189,6 +200,7 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                         // enqueue submit action
                         plupload_crudform_submit.attr('disabled', 'disabled');
                         plupload_crudform_submit.addClass('plupload_disabled');
+                        plupload_crudform_submit.val('...');
                         plupload_crudform.data('automatic_submit', true);
                         return false;
                     }

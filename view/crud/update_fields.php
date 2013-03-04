@@ -124,7 +124,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                     $read_url = __WWW__ . '/' . $data['alldata']['class'] . '/read?' . $data['current_key'];
                                     $read_file_url = $ns->mod_param($read_url, 'file', $tablefield);
 ?>
-    <a href="<?php echo $read_file_url; ?>" id="<?php echo $field_class; ?>-getfile" class="plupload_getfile">voir <?php echo $visiblename; ?></a>
+    <a href="<?php echo $read_file_url; ?>" id="<?php echo $field_class; ?>-getfile" target="_blank" class="plupload_getfile">voir <?php echo $visiblename; ?></a>
     <a href="" id="<?php echo $field_class; ?>-after" class="plupload_finished" style="display: none; ">supprimer</a>
     <span id="<?php echo $field_class; ?>-removecontainer">
     <input type="checkbox" id="<?php echo $field_class; ?>-remove" name="<?php echo $field_class; ?>-remove" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-remove" value="1" /> supprimer
