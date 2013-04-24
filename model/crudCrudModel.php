@@ -790,15 +790,17 @@ class crudCrudModel extends crudCrudModel_Parent
                         } else {
                             $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                             $err_msg = "You need a 'group by' if you want to use 'left join' for table `$table` (but none could be found automaticaly) ";
-                            echo "<br />\n" . '<strong>Clementine fatal error</strong>: ' . htmlentities($err_msg, ENT_COMPAT, mb_internal_encoding()) . ' in <strong>' . $backtrace[0]['file'] . '</strong> on line <strong>' . $backtrace[0]['line'] . '</strong>' . "<br />\n" . '<br />';
-                            die();
+                            if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
+                                Clementine::$register['clementine_debug_helper']->trigger_error($err_msg, E_USER_ERROR, 1);
+                            }
                         }
                     }
                 } else {
                     $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
                     $err_msg = "'left join' is only available for readonly_tables at the moment, and `$table` is not registered as one of them ";
-                    echo "<br />\n" . '<strong>Clementine fatal error</strong>: ' . htmlentities($err_msg, ENT_COMPAT, mb_internal_encoding()) . ' in <strong>' . $backtrace[0]['file'] . '</strong> on line <strong>' . $backtrace[0]['line'] . '</strong>' . "<br />\n" . '<br />';
-                    die();
+                    if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
+                        Clementine::$register['clementine_debug_helper']->trigger_error($err_msg, E_USER_ERROR, 1);
+                    }
                 }
             } else {
                 $sql .= "\n`" . $table_real . '` ';
