@@ -456,7 +456,9 @@ class crudCrudModel extends crudCrudModel_Parent
             $PK = array();
             foreach ($this->metas['primary_key'] as $table => $keys) {
                 foreach ($keys as $key => $type) {
-                    $PK[$table . '-' . $key] = '';
+                    if (!isset($this->metas['keys_to_ignore'][$table . '.' . $key])) {
+                        $PK[$table . '-' . $key] = '';
+                    }
                 }
             }
             $PK_filled = array();

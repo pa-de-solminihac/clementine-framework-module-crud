@@ -862,6 +862,8 @@ class crudCrudController extends crudCrudController_Parent
      *            dans la génération des formulaires
      *            cette fonction s'appelle depuis le controleur de la vue,
      *            apres avoir rempli le tableau $this->data
+     *            permet par exemple de rajouter des colonnes calculees dans la
+     *            page listing
      * 
      * @param mixed $tablefield : $table.$field
      * @param mixed $before_tablefield : $table.$field
