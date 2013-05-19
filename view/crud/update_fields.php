@@ -139,10 +139,26 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 break;
                             default:
                                 if (isset($fieldmeta['fieldvalues'])) {
+                                    if ($mapping == 'radio') {
+                                        $i = 0;
+                                        foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
+                                            ++$i;
+?>
+                <input type="radio" name="<?php echo $field_class; ?>" value="<?php echo $fieldkey; ?>" id="<?php echo $field_class . '-' . $i; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>" <?php
+    if ($fieldkey == $htmlval) {
+?>
+    checked="checked"
+<?php
+    }
+?> />
+<label for="<?php echo $field_class . '-' . $i; ?>"><?php echo $fieldkey; ?></label>
+<?php
+                                        }
+                                    } else {
 ?>
                 <select id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>">
 <?php
-                                    foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
+                                        foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
 ?>
     <option value="<?php echo $fieldkey; ?>" <?php
     if ($fieldkey == $htmlval) {
@@ -152,10 +168,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     }
 ?>><?php echo $fieldval; ?></option>
 <?php
-                                    }
+                                        }
 ?>
                 </select>
 <?php
+                                    }
                                 } else {
 ?>
                 <input type="<?php

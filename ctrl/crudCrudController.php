@@ -17,6 +17,7 @@ class crudCrudController extends crudCrudController_Parent
         'longtext'   => 'textarea',
         'text'       => 'textarea',
         'password'   => 'password',
+        'radio'      => 'radio',
         'html'       => 'html',
         'file'       => 'file',
         'hidden'     => 'hidden');
@@ -879,14 +880,14 @@ class crudCrudController extends crudCrudController_Parent
     {
         // ajoute le champ $tablefield dans les entetes...
         $ns = $this->getModel('fonctions');
+        if (isset($fieldmeta['type'])) {
+            $fieldmeta['custom_type'] = $fieldmeta['type'];
+        }
+        if (!$fieldmeta) {
+            $fieldmeta = array();
+        }
+        $fieldmeta['type'] = 'custom_field';
         if (isset($field_definition)) {
-            if (isset($fieldmeta['type'])) {
-                $fieldmeta['custom_type'] = $fieldmeta['type'];
-            }
-            if (!$fieldmeta) {
-                $fieldmeta = array();
-            }
-            $fieldmeta['type'] = 'custom_field';
             $this->_crud->addCustomField($tablefield, $field_definition);
         }
         if (!$fieldmeta) {
