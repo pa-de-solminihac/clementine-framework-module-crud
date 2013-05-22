@@ -40,16 +40,15 @@ Il permet aussi de :
 Utilisation
 -----------
 
-1. Créer un module dérivé de CRUD, en utilisant l'adoption 
+* Créer un module dérivé de CRUD, en utilisant l'adoption 
 
 Ajouter au fichier app/local/site/etc/config.ini :
+
     ; exemple pour un module de gestion d'annonces
     [clementine_inherit]
     annonce=crud
 
-2. Définir les tables qui doivent être gérées par CRUD
-
-En surchargeant la fonction _init() dans notre modèle, on définit quelles tables doivent être gérées par CRUD :
+* Définir les tables qui doivent être gérées par CRUD
 
 Créer un fichier app/local/site/model/siteAnnonceModel.php :
 
