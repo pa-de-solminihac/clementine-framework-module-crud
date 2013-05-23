@@ -75,3 +75,10 @@ class siteAnnonceModel extends siteAnnonceModel_Parent /* extends CrudModel */
 C'est tout.
 
 Mais on peut aller beaucoup plus loin. *To be continued...*
+
+Renommer un champ
+Modifier l'ordre des champs
+Changer le type d'un champ
+Gestion d'erreurs et champs obligatoires
+Gérer plusieurs tables et leurs relations
+Surcharger les formulaires : formulaire complet, éléments de formulaires, types de champs, champ spécifique, traitements JS/AJAX...
