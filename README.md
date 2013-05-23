@@ -13,11 +13,13 @@ et permet de nombreuses adaptations par le biais des surcharges. Il n'utilise pa
 On peut choisir de n'utiliser ce module que pour la partie modèle du MVC, auquel cas on s'en servira comme d'un ORM.
 
 Formulaires gérés :
-- creation et mise à jour, avec upload en AJAX avec barre de progression
+- creation et mise à jour
 - suppression
 - affichage
 - listing avec tri par colonnesm pagination et recherche, tout en AJAX (si vous le voulez), exportable en fichier XLS
 - flux RSS (bientôt ? dev à terminer)
+
+Bien entendu tout est fait pour que tous reste surchargeable.
 
 Le module CRUD proposera par défaut des éléments HTML adaptés en fonction du type SQL des champs :
 - checkbox
@@ -27,12 +29,13 @@ Le module CRUD proposera par défaut des éléments HTML adaptés en fonction du
 - radio
 - hidden
 - html non échappé
-- file
+- file (avec upload en AJAX, barres de progression, formats autorisés, génération de miniatures)
+- date (avec datepicker)
 - mettez ici ce que vous voulez : vous pouvez surcharger les types champ par champ ou définir vos propres mappings
 
 Il permet aussi de :
-- surcharger le nettoyage des champs, les contrôles d'erreurs
 - choisir l'ordre des champs, leur affichage ou non, leurs intitulés, la façon dont ils sont représentés au niveau HTML
+- surcharger le nettoyage des champs, les contrôles d'erreurs
 - définir des champs personnalisés (notamment au niveau SQL)
 - choisir les champs et tables à ne jamais modifier
 
@@ -62,4 +65,6 @@ Créer un fichier app/local/site/model/siteAnnonceModel.php :
     }
     
 
-C'est tout. Mais on peut aller beaucoup plus loin...
+C'est tout.
+
+Mais on peut aller beaucoup plus loin. To be continued...
