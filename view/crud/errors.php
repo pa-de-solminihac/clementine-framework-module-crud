@@ -1,8 +1,13 @@
 <?php
-if (count($data['errors']) && !(isset($data['hidden_sections']['errors']) && ($data['hidden_sections']['errors']))) {
+if (!empty($data['errors']) && !(isset($data['hidden_sections']['errors']) && ($data['hidden_sections']['errors']))) {
     if ($request->AJAX) {
         // si requete AJAX : affichage des erreurs dans une alerte JS
-        $message = "Merci de vérifier les points suivants : \r\n- ";
+        $message = "Merci de vérifier les points suivants : ";
+        if (!empty($data['errors']['error_title'])) {
+            $message = $data['errors']['error_title'];
+            unset($data['errors']['error_title']);
+            $message .= "\r\n- ";
+        }
         $message .= implode("\r\n- ", $data['errors']);
         echo $message;
     } else {
@@ -13,6 +18,15 @@ if (count($data['errors']) && !(isset($data['hidden_sections']['errors']) && ($d
         echo $data['formtype'];
     }
 ?>">
+<?php
+        $message = "Merci de vérifier les points suivants : ";
+        if (!empty($data['errors']['error_title'])) {
+            $message = $data['errors']['error_title'];
+            unset($data['errors']['error_title']);
+            $message .= "</br > \r\n";
+        }
+?>
+    <li class="errtitle err_error_title"><?php echo $message; ?></li>
 <?php
     foreach ($data['errors'] as $key => $errmsg) {
 ?>
