@@ -78,7 +78,8 @@ Mais on peut aller beaucoup plus loin. *To be continued...*
 
     Renommer un champ
     Modifier l'ordre des champs
-    Changer le type d'un champ
     Gestion d'erreurs et champs obligatoires
+    Types de champs : changer pour un type existant, créer un type, champs custom...
     Gérer plusieurs tables et leurs relations
     Surcharger les formulaires : formulaire complet, éléments de formulaires, types de champs, champ spécifique, traitements JS/AJAX...
+    
