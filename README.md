@@ -47,24 +47,27 @@ Utilisation
 
 Ajouter au fichier app/local/site/etc/config.ini :
 
-    ; exemple pour un module de gestion d'annonces
-    [clementine_inherit]
-    annonce=crud
+```ini
+; exemple pour un module de gestion d'annonces
+[clementine_inherit]
+annonce=crud
+```
 
 * Définir les tables qui doivent être gérées par CRUD
 
 Créer un fichier app/local/site/model/siteAnnonceModel.php :
 
-    class siteAnnonceModel extends siteAnnonceModel_Parent /* extends CrudModel */
+```php
+class siteAnnonceModel extends siteAnnonceModel_Parent /* extends CrudModel */
+{
+    public function _init($params = null)
     {
-        public function _init($params = null)
-        {
-            $this->tables = array(
-                'annonce' => ''
-            );
-    }
-    
+        $this->tables = array(
+            'annonce' => ''
+        );
+}
+```
 
 C'est tout.
 
-Mais on peut aller beaucoup plus loin. To be continued...
+Mais on peut aller beaucoup plus loin. _To be continued..._
