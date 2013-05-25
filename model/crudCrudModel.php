@@ -134,6 +134,10 @@ class crudCrudModel extends crudCrudModel_Parent
                     $champs = $db->list_fields($table_real);
                     foreach ($champs as $champ) {
                         $type = preg_replace('/[( ].*/', '', $champ['Type']);
+                        // cas particulier boolean vu comme tinyint
+                        if (strpos('tinyint(1)', $champ['Type']) === 0) {
+                            $type = 'boolean';
+                        }
                         $size = (int) preg_replace('/^[^\(]*\(/', '', $champ['Type']);
                         if (!isset($this->fields[$table_alias . '.' . $champ['Field']])) {
                             $this->fields[$table_alias . '.' . $champ['Field']] = array();
