@@ -295,7 +295,7 @@ class crudCrudController extends crudCrudController_Parent
                 if ($ns->ifGet('int', 'duplicate')) {
                     $params['duplicate'] = 1;
                 }
-                $result         = $this->handle_uploaded_files($params, $errors);
+                $result         = $this->handle_uploaded_files($params, $errors, 'create');
                 $uploaded_files = $result['uploaded_files'];
                 $move_errs      = $result['move_errs'];
             }
@@ -676,6 +676,8 @@ class crudCrudController extends crudCrudController_Parent
                 if (count($oldvalues_list)) {
                     $oldvalues = $ns->array_first($oldvalues_list);
                 }
+                // fix memory leak
+                unset($oldvalues_list);
             }
             if (!$this->_crud->deleteFromArray($params['get'], $params['dont_start_transaction'])) {
                 $errors[] = 'erreur rencontree lors de la suppression';
@@ -1157,7 +1159,7 @@ class crudCrudController extends crudCrudController_Parent
         }
     }
 
-    public function handle_uploaded_files(&$params, &$errors)
+    public function handle_uploaded_files(&$params, &$errors, $mode = 'update')
     {
         $ns = $this->getModel('fonctions');
         // deplacement des fichiers uploades
@@ -1183,13 +1185,16 @@ class crudCrudController extends crudCrudController_Parent
                         mkdir($destdir, 0777, true);
                     }
                 }
-                // on ne passe pas de parametres supplementaires ici, c'est volontaire
+                // lors d'un create, on ignore cette etape puisqu'on n'a pas encore d'id sur lequel faire le lien
                 $oldvalues = '';
-                if (is_array($params['get']) && count($params['get'])) {
+                // on ne passe pas de parametres supplementaires ici, c'est volontaire
+                if ($mode != 'create' && is_array($params['get']) && count($params['get'])) {
                     $oldvalues_list = $this->_crud->getFromArray($params['get']);
                     if (count($oldvalues_list)) {
                         $oldvalues = $ns->array_first($oldvalues_list);
                     }
+                    // fix memory leak
+                    unset($oldvalues_list);
                 }
                 $file_changed = 0;
                 if (is_array($oldvalues) && array_key_exists($tablefield_nothidden, $oldvalues) && $oldvalues[$tablefield_nothidden] !== $val) {
