@@ -5,19 +5,19 @@ Clementine Framework : module CRUD
 Présentation
 ------------
 
-Ce module fournit des formulaires permettant de gérer la base de données. 
+Ce module fournit des formulaires (et quelques fonctionnalités supplémentaires) permettant d'interagir avec la base de données. 
 Il est capable de gérer les liens entre les tables, les clés primaires ou étrangères, 
-et permet de nombreuses adaptations par le biais des surcharges. Il n'utilise pas de code généré pour pouvoir 
-évoluer automatiquement lorsque la base de données évolue.
+et permet de nombreuses adaptations par le biais des surcharges. Il n'utilise pas de code généré. 
+Il s'adapte automatiquement lorsque la base de données évolue.
 
 *On peut choisir de n'utiliser ce module que pour la partie modèle du MVC, auquel cas on s'en servira comme d'un ORM.*
 
-**Formulaires gérés :**
+**Formulaires créé :**
 - creation et mise à jour
 - suppression
 - affichage
-- listing avec tri par colonnesm pagination et recherche, tout en AJAX (si vous le voulez), exportable en fichier XLS
-- flux RSS (bientôt ? dev à terminer)
+- listing avec tri par colonnes, pagination et recherche, tout en AJAX (si vous le voulez), exportable en fichier XLS
+- flux RSS (bientôt ? dev à terminer...)
 
 *Bien entendu tout est fait pour que tous reste surchargeable.*
 
