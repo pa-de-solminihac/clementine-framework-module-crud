@@ -16,7 +16,8 @@ Il s'adapte automatiquement lorsque la base de données évolue.
 - creation et mise à jour
 - suppression
 - affichage
-- listing avec tri par colonnes, pagination et recherche, tout en AJAX (si vous le voulez), exportable en fichier XLS
+- listing avec tri par colonnes, pagination et moteur de recherche, tout en AJAX (si vous le voulez)
+- export des listings en fichier XLS (listings complets ou résultats de recherches)
 - flux RSS (bientôt ? dev à terminer...)
 
 *Bien entendu tout est fait pour que tous reste surchargeable.*
@@ -31,7 +32,7 @@ Le module CRUD proposera par défaut des éléments HTML adaptés en fonction du
 - radio
 - hidden
 - html non échappé
-- file (avec upload en AJAX, barres de progression, formats autorisés, génération de miniatures)
+- file (avec upload en AJAX, barres de progression, formats autorisés, génération de miniatures, protection de l'URL d'accès aux fichiers)
 - date (avec datepicker)
 - *mettez ici ce que vous voulez* : vous pouvez surcharger les types champ par champ ou définir vos propres mappings
 
