@@ -15,7 +15,7 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
     $iTotal = $data['nb_total_values'];
     $iFilteredTotal = $iTotal;
     $output = array(
-        "sEcho" => (int) $_GET['sEcho'],
+        "sEcho" => $request->get('int', 'sEcho'),
         "iTotalRecords" => $iTotal,
         "iTotalDisplayRecords" => $iFilteredTotal,
         "aaData" => array()
@@ -179,7 +179,12 @@ if (isset($data['return_json']) && $data['return_json']) {
         foreach ($header as $key => $val) {
             $header_titles[$key] = trim(strip_tags($val['title']));
         }
-        $ns->matrix2xls('export.xls', $donnees, $header_titles);
+        // $ns->matrix2xls('export.xls', $donnees, $header_titles);
+        echo serialize(array(
+            'filename' => 'export.xls',
+            'donnees' => $donnees,
+            'header_titles' => $header_titles
+        ));
     } else {
         echo json_encode($output);
     }

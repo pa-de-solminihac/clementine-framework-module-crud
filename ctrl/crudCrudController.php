@@ -101,6 +101,9 @@ class crudCrudController extends crudCrudController_Parent
         // export XLS si on ajoute dans l'URL &export_xls&sEcho=1
         if (isset($params['get']['export_xls'])) {
             $this->data['export_xls'] = 1;
+            if (isset($params['get']['export_xls_onlydata'])) {
+                $this->data['export_xls_onlydata'] = 1;
+            }
             $this->data['return_json'] = 1;
             if (!defined('__NO_DEBUG_DIV__')) {
                 define ('__NO_DEBUG_DIV__', true);
@@ -223,6 +226,17 @@ class crudCrudController extends crudCrudController_Parent
         }
         $this->alter_values($params);
         $this->alter_values_index($params);
+        // export xls si demande
+        if (isset($this->data['return_json']) && $this->data['return_json'] && isset($this->data['export_xls'])) {
+            if (isset($this->data['export_xls'])) {
+                $a_exporter = unserialize($this->getBlockHtml($this->data['class'] . '/index', $this->data));
+                if (isset($this->data['export_xls_onlydata'])) {
+                    return $a_exporter;
+                }
+                $ns = $this->getModel('fonctions');
+                $ns->matrix2xls($a_exporter['filename'], $a_exporter['donnees'], $a_exporter['header_titles']);
+            }
+        }
     }
 
     /**
