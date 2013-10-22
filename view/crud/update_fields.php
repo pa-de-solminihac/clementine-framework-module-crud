@@ -161,7 +161,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                         foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
 ?>
     <option value="<?php echo $fieldkey; ?>" <?php
-    if ($fieldkey == $htmlval) {
+    if ($ns->htmlentities($fieldkey) == $htmlval) {
 ?>
     selected="selected"
 <?php
