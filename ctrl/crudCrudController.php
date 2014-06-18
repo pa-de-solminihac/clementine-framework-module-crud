@@ -1221,6 +1221,14 @@ class crudCrudController extends crudCrudController_Parent
                 $remove_file = isset($params['post'][$fieldkey_nothidden . '-remove']) && $params['post'][$fieldkey_nothidden . '-remove'] == '1';
                 // si le fichier a ete modifie, ou si on demande a le supprimer
                 if ($file_changed || $remove_file) {
+                    if (preg_match('#MSIE#', $_SERVER['HTTP_USER_AGENT'])) {
+						$ie = array('#MSIE 7.0#', '#MSIE 8.0#', '#MSIE 9.0#');
+						foreach ($ie as $v) {
+							if (preg_match($v, $_SERVER['HTTP_USER_AGENT'])) {
+								$val = substr($val, 1);
+							}
+						}
+					}
                     if ($file_changed && $val && !rename(__FILES_ROOT__ . '/tmp/' . $val, $destdir . $val)) {
                         $move_errs[] = 'Impossible de déplacer le fichier ' . $tablefield_nothidden . ' vers sa destination. Problème de permissions ?';
                         $move_errs[] = 'rename(' . __FILES_ROOT__ . '/tmp/' . $val . ', ' . $destdir . $val;
