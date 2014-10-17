@@ -4,7 +4,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * mapping_to_HTML : defaults to 'input type="text"' in 'crud/update' block
-     * 
+     *
      */
     public $mapping_to_HTML = array(
         'bit'        => 'checkbox',
@@ -26,9 +26,9 @@ class crudCrudController extends crudCrudController_Parent
     protected $_crud;
 
     /**
-     * options : permet de desactiver l'autoload des valeurs des 
+     * options : permet de desactiver l'autoload des valeurs des
      *           clés étrangères, utile pour des raisons de performances
-     * 
+     *
      */
     public $options = array('autoload_foreign_keys_values' => false);
 
@@ -53,7 +53,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * indexAction : liste des enregistrements
-     * 
+     *
      * @access public
      * @return void
      */
@@ -241,7 +241,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * createAction : création d'un nouvel enregistrement
-     * 
+     *
      * @access public
      * @return void
      */
@@ -398,7 +398,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * readAction : affichage d'un enregistrement
-     * 
+     *
      * @access public
      * @return void
      */
@@ -503,7 +503,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * updateAction : edition et sauvegarde d'un enregistrement
-     * 
+     *
      * @access public
      * @return void
      */
@@ -624,7 +624,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * deletetmpfile : supprime un fichier uploade durant la session courante (donc par l'utilisateur courant)
-     * 
+     *
      * @access public
      * @return void
      */
@@ -655,7 +655,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * deleteAction : suppression d'un enregistrement
-     * 
+     *
      * @access public
      * @return void
      */
@@ -722,7 +722,7 @@ class crudCrudController extends crudCrudController_Parent
      * hideSection : raccourci pour masquer une section dans une vue
      *               cette fonction s'appelle depuis le controleur de la vue,
      *               apres avoir rempli le tableau $this->data
-     * 
+     *
      * @param mixed $section : nom de la section
      * @access public
      * @return void
@@ -743,7 +743,7 @@ class crudCrudController extends crudCrudController_Parent
      * unhideSection : raccourci pour demasquer une section dans une vue
      *                 cette fonction s'appelle depuis le controleur de la vue,
      *                 apres avoir rempli le tableau $this->data
-     * 
+     *
      * @param mixed $section : nom de la section
      * @access public
      * @return void
@@ -758,8 +758,8 @@ class crudCrudController extends crudCrudController_Parent
      * hideField : raccourci pour masquer un champ dans une vue
      *             cette fonction s'appelle depuis le controleur de la vue,
      *             apres avoir rempli le tableau $this->data
-     * 
-     * @param mixed $tablefield 
+     *
+     * @param mixed $tablefield
      * @access public
      * @return void
      */
@@ -773,8 +773,8 @@ class crudCrudController extends crudCrudController_Parent
      * unhideField : raccourci pour demasquer un champ dans une vue
      *               cette fonction s'appelle depuis le controleur de la vue,
      *               apres avoir rempli le tableau $this->data
-     * 
-     * @param mixed $tablefield 
+     *
+     * @param mixed $tablefield
      * @access public
      * @return void
      */
@@ -786,8 +786,8 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * hideAllFields : masque tous les champs
-     * 
-     * @param mixed $tablefield 
+     *
+     * @param mixed $tablefield
      * @access public
      * @return void
      */
@@ -801,8 +801,8 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * unhideAllFields : demasque tous les champs
-     * 
-     * @param mixed $tablefield 
+     *
+     * @param mixed $tablefield
      * @access public
      * @return void
      */
@@ -816,8 +816,8 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * hideSections : appelle hideSection pour plusieurs sections (permet de réunir les appels en un seul pour plus de lisibilité)
-     * 
-     * @param mixed $sections 
+     *
+     * @param mixed $sections
      * @access public
      * @return void
      */
@@ -831,8 +831,8 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * unhideSections : appelle unhideSection pour plusieurs sections (permet de réunir les appels en un seul pour plus de lisibilité)
-     * 
-     * @param mixed $sections 
+     *
+     * @param mixed $sections
      * @access public
      * @return void
      */
@@ -846,8 +846,8 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * hideFields : appelle hideField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
-     * 
-     * @param mixed $fields 
+     *
+     * @param mixed $fields
      * @access public
      * @return void
      */
@@ -861,8 +861,8 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * unhideFields : appelle unhideField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
-     * 
-     * @param mixed $fields 
+     *
+     * @param mixed $fields
      * @access public
      * @return void
      */
@@ -875,17 +875,17 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * addField : ajoute un champ "virtuel", sans valeur mais qui sera utilisé 
+     * addField : ajoute un champ "virtuel", sans valeur mais qui sera utilisé
      *            dans la génération des formulaires
      *            cette fonction s'appelle depuis le controleur de la vue,
      *            apres avoir rempli le tableau $this->data
      *            permet par exemple de rajouter des colonnes calculees dans la
      *            page listing
-     * 
+     *
      * @param mixed $tablefield : $table.$field
      * @param mixed $before_tablefield : $table.$field
-     * @param mixed $fieldsmeta : tableau de meta informations sur le champ, 
-     *                            par exemple : array('type' => 'varchar', 
+     * @param mixed $fieldsmeta : tableau de meta informations sur le champ,
+     *                            par exemple : array('type' => 'varchar',
                                                       'fieldvalues' => array('Foo' => 'foo',
                                                                              'Bar' => 'bar'),
                                                       'default_value' => 'Bar')
@@ -944,10 +944,10 @@ class crudCrudController extends crudCrudController_Parent
      *             tableau de valeurs
      *             cette fonction s'appelle depuis le controleur de la vue,
      *             apres avoir rempli le tableau $this->data
-     * 
+     *
      * @param mixed $tablefield : $table.$field
      * @param mixed $before_tablefield : $table.$field
-     * @param mixed $type 
+     * @param mixed $type
      * @access public
      * @return void
      */
@@ -966,7 +966,7 @@ class crudCrudController extends crudCrudController_Parent
         } else {
             $this->data['fields'][$tablefield] = $fieldmeta;
         }
-        // pas besoin de deplacer les valeurs, ce serait une perte de 
+        // pas besoin de deplacer les valeurs, ce serait une perte de
         // performances inutile, puisque l'ordre est donne par data[fields]
         return true;
     }
@@ -975,9 +975,9 @@ class crudCrudController extends crudCrudController_Parent
      * mapFieldName : raccourci pour renommer un champ dans une vue
      *                cette fonction s'appelle depuis le controleur de la vue,
      *                apres avoir rempli le tableau $this->data
-     * 
-     * @param mixed $tablefield 
-     * @param mixed $name 
+     *
+     * @param mixed $tablefield
+     * @param mixed $name
      * @access public
      * @return void
      */
@@ -991,9 +991,9 @@ class crudCrudController extends crudCrudController_Parent
      * unmapFieldName : raccourci pour annuler le renommage d'un champ dans une vue
      *                  cette fonction s'appelle depuis le controleur de la vue,
      *                  apres avoir rempli le tableau $this->data
-     * 
-     * @param mixed $tablefield 
-     * @param mixed $name : si différent de false, n'annule le renommage que 
+     *
+     * @param mixed $tablefield
+     * @param mixed $name : si différent de false, n'annule le renommage que
      *                      s'il a la valeur $name
      * @access public
      * @return void
@@ -1013,9 +1013,9 @@ class crudCrudController extends crudCrudController_Parent
      *                  dans une vue, ce qui fait du champ un SELECT
      *                  cette fonction s'appelle depuis le controleur de la vue,
      *                  apres avoir rempli le tableau $this->data
-     * 
-     * @param mixed $tablefield 
-     * @param mixed $values 
+     *
+     * @param mixed $tablefield
+     * @param mixed $values
      * @access public
      * @return void
      */
@@ -1030,14 +1030,14 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * unsetFieldValues : raccourci pour vider les valeurs possibles d'un champ 
+     * unsetFieldValues : raccourci pour vider les valeurs possibles d'un champ
      *                    dans une vue, ce qui fait du champ un SELECT
      *                    cette fonction s'appelle depuis le controleur de la vue,
      *                    apres avoir rempli le tableau $this->data
-     * 
-     * @param mixed $table 
-     * @param mixed $field 
-     * @param mixed $values 
+     *
+     * @param mixed $table
+     * @param mixed $field
+     * @param mixed $values
      * @access public
      * @return void
      */
@@ -1051,10 +1051,10 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * sanitize : filtre les valeurs du tableau $insecure_array 
+     * sanitize : filtre les valeurs du tableau $insecure_array
      *            renvoie le tableau filtré
-     * 
-     * @param mixed $insecure_array 
+     *
+     * @param mixed $insecure_array
      * @access public
      * @return void
      */
@@ -1068,7 +1068,7 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * validate : valide les donnees avant creation ou mise à jour
      *            renvoie un tableau listant les erreurs rencontrees
-     * 
+     *
      * @param mixed $insecure_values : tableau associatif 'table-champ' => 'valeur', par exemple $_POST
      * @param mixed $insecure_primary_key : tableau associatif 'table-champ' => 'valeur', par exemple $_GET
      * @access public
@@ -1221,14 +1221,6 @@ class crudCrudController extends crudCrudController_Parent
                 $remove_file = isset($params['post'][$fieldkey_nothidden . '-remove']) && $params['post'][$fieldkey_nothidden . '-remove'] == '1';
                 // si le fichier a ete modifie, ou si on demande a le supprimer
                 if ($file_changed || $remove_file) {
-                    if (preg_match('#MSIE#', $_SERVER['HTTP_USER_AGENT'])) {
-						$ie = array('#MSIE 7.0#', '#MSIE 8.0#', '#MSIE 9.0#');
-						foreach ($ie as $v) {
-							if (preg_match($v, $_SERVER['HTTP_USER_AGENT'])) {
-								$val = substr($val, 1);
-							}
-						}
-					}
                     if ($file_changed && $val && !rename(__FILES_ROOT__ . '/tmp/' . $val, $destdir . $val)) {
                         $move_errs[] = 'Impossible de déplacer le fichier ' . $tablefield_nothidden . ' vers sa destination. Problème de permissions ?';
                         $move_errs[] = 'rename(' . __FILES_ROOT__ . '/tmp/' . $val . ', ' . $destdir . $val;
@@ -1370,8 +1362,8 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * get_unquoted_gpc : recupere $_GET, $_POST et $_COOKIE dans le tableau $params si necessaire
      *                    applique stripslashes dessus si get_magic_quotes_gpc() == true
-     * 
-     * @param mixed $params 
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1397,9 +1389,9 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * reverse_translate_dates_gp : 
-     * 
-     * @param mixed $params 
+     * reverse_translate_dates_gp :
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1478,10 +1470,10 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * handle_ajax_filtering : datatables ajax filtering (recherche dans les champs affichés uniquement)
-     * 
-     * @param mixed $champs_affiches 
-     * @param mixed $metas 
-     * @param mixed $params 
+     *
+     * @param mixed $champs_affiches
+     * @param mixed $metas
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1529,7 +1521,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * override_fields : surcharge les types de champs
-     * 
+     *
      * @access public
      * @return void
      */
@@ -1559,8 +1551,8 @@ class crudCrudController extends crudCrudController_Parent
      *                pour passer sur toutes les valeurs chargees et les modifier avant
      *                de les transmettre à la vue. Pour changer le format d'une date, etc...
      *                NOTE : pas idéal niveau performances
-     * 
-     * @param mixed $params 
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1582,10 +1574,10 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * rename_fields : fonction appellée par index, creation, read, et update
-     *                 pour renommer les champs avant affichage, par des appels 
+     *                 pour renommer les champs avant affichage, par des appels
      *                 à mapFieldName normalement...
-     * 
-     * @param mixed $params 
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1608,8 +1600,8 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * hide_fields : fonction appellée par index, creation, read, et update
      *               pour masquer les champs par des appels a hideField
-     * 
-     * @param mixed $params 
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1632,8 +1624,8 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * add_fields : fonction appellée par index, creation, read, et update
      *              pour ajouter des champs par des appels a addField
-     * 
-     * @param mixed $params 
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1656,8 +1648,8 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * move_fields : fonction appellée par index, creation, read, et update
      *               pour ajouter des champs par des appels a moveField
-     * 
-     * @param mixed $params 
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */
@@ -1680,8 +1672,8 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * hide_sections : fonction appellée par index, creation, read, et update
      *                 pour masquer des sections par des appels a hideSection
-     * 
-     * @param mixed $params 
+     *
+     * @param mixed $params
      * @access public
      * @return void
      */

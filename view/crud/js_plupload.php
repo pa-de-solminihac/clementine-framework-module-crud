@@ -77,13 +77,6 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                             }
                             msg = info.response;
                             var retval = msg.substring(0, 1);
-                            // fix IE
-        					if (jQuery.browser.msie) {
-        						var version = jQuery.browser.version;
-        						if (jQuery.inArray(version, ['7.0', '8.0', '9.0']) != -1) {
-        							retval = msg.substring(1, 2);
-        						}
-        					}
                             if (retval == '0') {
                                 var noms = msg.substring(1).split(':');
                                 var temp_name = noms[0];
