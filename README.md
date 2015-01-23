@@ -78,17 +78,18 @@ C'est tout.
 Mais on peut aller beaucoup plus loin. 
 
 *To be continued...*
+---
 
-Affichage
-```
-    Renommer un champ
-    Modifier l'ordre des champs
-    Gestion d'erreurs et champs obligatoires
-    Types de champs : changer pour un type existant, créer un type, champs custom...
-    Surcharger les formulaires : formulaire complet, éléments de formulaires, types de champs, champ spécifique, traitements JS/AJAX...
-```
+**Affichage**
 
-Structures complexes
-```
-    Gérer plusieurs tables et leurs relations : inner join, left join, group by et tables en lecture seule
-```
+- Renommer un champ
+- Modifier l'ordre des champs
+- Gestion d'erreurs et champs obligatoires
+- Types de champs : changer pour un type existant, créer un nouveau type, champs custom...
+- Surcharger les formulaires : formulaire complet, éléments de formulaires, types de champs, champ spécifique, traitements JS/AJAX...
+
+**Structures complexes**
+
+- Gérer plusieurs tables et leurs relations : 
+ + inner join
+ + left join, group by et tables en lecture seule
