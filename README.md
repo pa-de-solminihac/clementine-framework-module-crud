@@ -50,7 +50,7 @@ Utilisation
 
 * **Créer un module dérivé de CRUD**
 
-Ajouter au fichier app/local/site/etc/config.ini :
+Ajouter au fichier `app/local/site/etc/config.ini` :
 
 ```ini
 ; exemple pour un module de gestion d'annonces
@@ -60,7 +60,7 @@ annonce=crud
 
 * **Définir les tables qui doivent être gérées par CRUD**
 
-Créer un fichier app/local/site/model/siteAnnonceModel.php :
+Créer un fichier `app/local/site/model/siteAnnonceModel.php` :
 
 ```php
 class siteAnnonceModel extends siteAnnonceModel_Parent /* extends CrudModel */
