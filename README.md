@@ -104,3 +104,5 @@ Mais on peut aller beaucoup plus loin.
 - Gérer plusieurs tables et leurs relations : 
  + inner join
  + left join, group by et tables en lecture seule
+
+cf. ticket #6
