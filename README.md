@@ -48,6 +48,17 @@ Il permet aussi de :
 Utilisation
 -----------
 
+* **Installer le module `crud`, en le déclarant comme dépendance du site**
+
+Ajouter au fichier `app/local/site/etc/modules.ini` :
+
+```ini
+[depends_1]
+crud=4
+```
+
+Il suffit ensuite de lancer l'installeur.
+
 * **Créer un module dérivé de CRUD**
 
 Ajouter au fichier `app/local/site/etc/config.ini` :
