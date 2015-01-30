@@ -105,4 +105,4 @@ Mais on peut aller beaucoup plus loin.
  + inner join
  + left join, group by et tables en lecture seule
 
-cf. ticket #6
+[cf. ticket #6](https://github.com/pa-de-solminihac/clementine-framework-module-crud/issues/6)
