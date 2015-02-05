@@ -907,7 +907,7 @@ class crudCrudController extends crudCrudController_Parent
     public function setMandatoryFields($tablefields)
     {
         foreach ($tablefields as $tablefield) {
-            $this->setMandatoryFields($tablefield);
+            $this->setMandatoryField($tablefield);
         }
         return true;
     }
