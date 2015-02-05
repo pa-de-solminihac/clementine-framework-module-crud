@@ -27,8 +27,7 @@ class crudDebugHelper extends crudDebugHelper_Parent
     public function unknown_element ()
     {
         if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
-            $this->trigger_error("Crud read : cet élément n'existe pas ou n'est pas accessible ", E_USER_WARNING, 1);
+            $this->trigger_error("Crud unknown element : cet élément n'existe pas ou n'est pas accessible ", E_USER_WARNING, 1);
         }
     }
 }
-?>

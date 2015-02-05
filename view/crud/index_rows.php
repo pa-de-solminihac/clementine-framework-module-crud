@@ -7,7 +7,7 @@ $row = array();
 if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
             <tr>
-<?php 
+<?php
 }
 foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     if (array_key_exists($tablefield, $data['ligne'])) { // array_key_exists !== isset
@@ -35,7 +35,12 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                 }
                 if (!$hidden) {
                     if ($this->canGetBlock($data['alldata']['class'] . '/index_fields/custom_' . $tablefield)) {
-                        $out = $this->getBlockHtml($data['alldata']['class'] . '/index_fields/custom_' . $tablefield, array('tablefield' => $tablefield, 'current_key' => $data['current_key'], 'ligne' => $data['ligne'], 'data' => $data['alldata']));
+                        $out = $this->getBlockHtml($data['alldata']['class'] . '/index_fields/custom_' . $tablefield, array(
+                            'tablefield' => $tablefield,
+                            'current_key' => $data['current_key'],
+                            'ligne' => $data['ligne'],
+                            'data' => $data['alldata']
+                        ));
                         if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
                             echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $out);
                         } else {
@@ -55,23 +60,24 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 $out = '<a href="' . __WWW__ . '/' . $data['alldata']['class'] . '/' . $data['alldata']['formtype'] . '?' . $ns->htmlentities($data['current_key']) . '">';
                             }
                             switch ($mapping) {
-                                case 'checkbox':
-                                    if ($data['ligne'][$tablefield]) {
-                                        $out .= '✓';
-                                    } else {
-                                        $out .= '✕';
-                                    }
-                                    break;
-                                default:
-                                    if (!empty($fieldmeta['fieldvalues']) && isset($fieldmeta['fieldvalues'][$data['ligne'][$tablefield]])) {
-                                        $out .= $fieldmeta['fieldvalues'][$data['ligne'][$tablefield]];
-                                    } else {
-                                        $out .= $ns->htmlentities($ns->truncate($data['ligne'][$tablefield], 50));
-                                    }
-                                    break;
+                            case 'checkbox':
+                                if ($data['ligne'][$tablefield]) {
+                                    $out.= '✓';
+                                } else {
+                                    $out.= '✕';
+                                }
+                                break;
+
+                            default:
+                                if (!empty($fieldmeta['fieldvalues']) && isset($fieldmeta['fieldvalues'][$data['ligne'][$tablefield]])) {
+                                    $out.= $fieldmeta['fieldvalues'][$data['ligne'][$tablefield]];
+                                } else {
+                                    $out.= $ns->htmlentities($ns->truncate($data['ligne'][$tablefield], 50));
+                                }
+                                break;
                             }
                             if ($data['alldata']['formtype'] != 'none') {
-                                $out .= '</a>';
+                                $out.= '</a>';
                             }
                             if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
                                 echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $out);
@@ -90,7 +96,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
         }
     }
 }
-$out = $this->getBlockHtml($data['alldata']['class'] . '/index_actions', array('current_key' => $data['current_key'], 'ligne' => $data['ligne'], 'alldata' => $data['alldata']));
+$out = $this->getBlockHtml($data['alldata']['class'] . '/index_actions', array(
+    'current_key' => $data['current_key'],
+    'ligne' => $data['ligne'],
+    'alldata' => $data['alldata']
+));
 if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
             <td>
@@ -106,4 +116,3 @@ if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])
 if (isset($data['alldata']['return_json']) && $data['alldata']['return_json']) {
     echo json_encode(str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $row));
 }
-?>

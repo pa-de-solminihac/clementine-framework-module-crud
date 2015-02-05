@@ -895,4 +895,3 @@ class crudCrudModel extends crudCrudModel_Parent
     }
 
 }
-?>

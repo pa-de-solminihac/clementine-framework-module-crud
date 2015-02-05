@@ -3,7 +3,14 @@ class crudCrudController extends crudCrudController_Parent
 {
 
     /**
-     * mapping_to_HTML : defaults to 'input type="text"' in 'crud/update' block
+     * =========
+     * Attributs
+     * =========
+     */
+
+    /**
+     * mapping_to_HTML : mapping des champs SQL => HTML pour les formulaires
+     *                   defaults to 'input type="text"'
      *
      */
     public $mapping_to_HTML = array(
@@ -11,32 +18,68 @@ class crudCrudController extends crudCrudController_Parent
         'boolean'    => 'checkbox',
         'enum'       => 'select',
         'set'        => 'select',
+        'tinyint'    => 'number',
+        'int'        => 'number',
+        'smallint'   => 'number',
+        'mediumint'  => 'number',
+        'bigint'     => 'number',
         'tinytext'   => 'textarea',
-        'tinytext'   => 'textarea',
+        'text'       => 'textarea',
         'mediumtext' => 'textarea',
         'longtext'   => 'textarea',
-        'text'       => 'textarea',
         'password'   => 'password',
+        'tel'        => 'tel',
+        'url'        => 'url',
+        'email'      => 'email',
+        'search'     => 'search',
+        'datetime'   => 'datetime',
+        'date'       => 'date',
+        'time'       => 'time',
+        'month'      => 'month',
+        'week'       => 'week',
+        'number'     => 'number',
+        'range'      => 'range',
+        'color'      => 'color',
         'radio'      => 'radio',
         'html'       => 'html',
         'file'       => 'file',
-        'hidden'     => 'hidden');
+        'hidden'     => 'hidden',
+        'input'      => 'text',
+        'span'       => 'span',
+    );
 
+    /**
+     * _class : nom de la classe instanciée
+     */
     protected $_class;
+
+    /**
+     * _crud : modèle CRUD instancié
+     */
     protected $_crud;
 
     /**
-     * options : permet de desactiver l'autoload des valeurs des
-     *           clés étrangères, utile pour des raisons de performances
-     *
+     * options : desactive l'autoload des valeurs des clés étrangères
+     *           utile pour des raisons de performances
      */
-    public $options = array('autoload_foreign_keys_values' => false);
+    public $options = array(
+        'autoload_foreign_keys_values' => false
+    );
 
+    /**
+     * ============
+     * Constructeur
+     * ============
+     */
+
+    /**
+     * __construct : instancie le modèle et récupère la liste des champs dans $this->data['fields']
+     */
     public function __construct($request)
     {
-        // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         $class = strtolower(substr(get_class($this), 0, -10));
         $this->_class = $class;
+        //cette classe est destinee a etre surchargee elle ne doit servir a rien sinon !
         if ($this->_class == 'crud') {
             return false;
         }
@@ -46,19 +89,30 @@ class crudCrudController extends crudCrudController_Parent
         }
         if (!isset($this->data['fields'])) {
             $to_merge = array();
-            $to_merge['fields']  = $this->_crud->fields;
+            $to_merge['fields'] = $this->_crud->fields;
             $this->merge_fields($to_merge);
         }
     }
 
     /**
+     * ============
+     * Actions CRUD
+     * ============
+     */
+
+    /**
      * indexAction : liste des enregistrements
+     *               peut renvoyer un export XLS si $_GET['export_xls'], 
+     *               sans noms de colonnes si $_GET['export_xls_onlydata']
+     *               compatible AJAX
      *
      * @access public
      * @return void
      */
     public function indexAction($request, $params = null)
     {
+        $this->need_privileges($request, $params);
+        $this->need_privileges_index($request, $params);
         $this->data['return_json'] = 0;
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         if (get_class($this) == 'CrudController') {
@@ -75,11 +129,11 @@ class crudCrudController extends crudCrudController_Parent
         // recupere les valeurs postees
         $this->get_unquoted_gpc($params);
         $to_merge = array();
-        $to_merge['tables']  = $this->_crud->tables;
+        $to_merge['tables'] = $this->_crud->tables;
         // fonctions pour faciliter la surcharge
         $this->add_fields($params);
         $this->add_fields_index($params);
-        $to_merge['metas']   = $this->_crud->metas;
+        $to_merge['metas'] = $this->_crud->metas;
         // gestion des champs masques
         foreach ($this->_crud->metas['hidden_fields'] as $key => $val) {
             if ($val) {
@@ -106,7 +160,7 @@ class crudCrudController extends crudCrudController_Parent
             }
             $this->data['return_json'] = 1;
             if (!defined('__NO_DEBUG_DIV__')) {
-                define ('__NO_DEBUG_DIV__', true);
+                define('__NO_DEBUG_DIV__', true);
             }
             $params['limit'] = false;
             $params['sql_calc_found_rows'] = false;
@@ -115,10 +169,10 @@ class crudCrudController extends crudCrudController_Parent
         if (isset($params['get']['iDisplayStart'])) {
             $this->data['return_json'] = 1;
             if (!defined('__NO_DEBUG_DIV__')) {
-                define ('__NO_DEBUG_DIV__', true);
+                define('__NO_DEBUG_DIV__', true);
             }
             if (isset($params['get']['iDisplayLength']) && ($params['get']['iDisplayLength'] != '-1')) {
-                $params['limit'] = (int) $params['get']['iDisplayStart'] . ', ' . (int) $params['get']['iDisplayLength'];
+                $params['limit'] = (int)$params['get']['iDisplayStart'] . ', ' . (int)$params['get']['iDisplayLength'];
                 $params['sql_calc_found_rows'] = true;
             }
         }
@@ -139,15 +193,17 @@ class crudCrudController extends crudCrudController_Parent
         if (isset($params['get']['iSortCol_0'])) {
             $this->data['return_json'] = 1;
             if (!defined('__NO_DEBUG_DIV__')) {
-                define ('__NO_DEBUG_DIV__', true);
+                define('__NO_DEBUG_DIV__', true);
             }
             $order_by = array();
-            $sort_ways = array('asc' => 'ASC', 'desc' => 'DESC');
-            for ($i = 0 ; $i < (int) $params['get']['iSortingCols']; ++$i)
-            {
-                if ($params['get']['bSortable_' . (int) $params['get']['iSortCol_'.$i]] == "true") {
-                    if (isset($champs_affiches[(int) $params['get']['iSortCol_' . $i]]) && isset($sort_ways[$params['get']['sSortDir_' . $i]])) {
-                        $sort_field = $champs_affiches[(int) $params['get']['iSortCol_' . $i]];
+            $sort_ways = array(
+                'asc' => 'ASC',
+                'desc' => 'DESC'
+            );
+            for ($i = 0; $i < (int)$params['get']['iSortingCols']; ++$i) {
+                if ($params['get']['bSortable_' . (int)$params['get']['iSortCol_' . $i]] == "true") {
+                    if (isset($champs_affiches[(int)$params['get']['iSortCol_' . $i]]) && isset($sort_ways[$params['get']['sSortDir_' . $i]])) {
+                        $sort_field = $champs_affiches[(int)$params['get']['iSortCol_' . $i]];
                         $sort_way = $sort_ways[$params['get']['sSortDir_' . $i]];
                         $order = $sort_field . ' ' . $sort_way;
                         if (isset($this->data['metas']['custom_order_by'][$sort_field]) && isset($this->data['metas']['custom_order_by'][$sort_field][$sort_way])) {
@@ -167,7 +223,7 @@ class crudCrudController extends crudCrudController_Parent
             if (!isset($params['where'])) {
                 $params['where'] = ' 1 ';
             }
-            $params['where'] .= ' AND (' . $filter_where . ') ';
+            $params['where'].= ' AND (' . $filter_where . ') ';
         }
         $cssjs = $this->getModel('cssjs');
         // charge les valeurs pour les clés étrangères
@@ -186,22 +242,22 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // charge les valeurs
-        $this->register_ui_scripts();
+        $this->register_ui_scripts('index');
         if ($cssjs->is_registered_foot('clementine_crud-datatables')) {
             if (isset($params['get']['iDisplayLength'])) {
-                $values  = $this->_crud->getList($params);
+                $values = $this->_crud->getList($params);
             } else {
                 // on charge quand meme un element
                 $fake_params = $params;
                 if (!isset($fake_params['limit'])) {
                     $fake_params['limit'] = '1'; // limit a 1 pour eviter le contenu qui apparait en flash
                 }
-                $values  = $this->_crud->getList($fake_params);
+                $values = $this->_crud->getList($fake_params);
             }
         } else {
-            $values  = $this->_crud->getList($params);
+            $values = $this->_crud->getList($params);
         }
-        $to_merge['values']  = $values;
+        $to_merge['values'] = $values;
         $this->merge_values($to_merge);
         // prise en compte des champs ajoutés
         foreach ($this->data['values'] as $key => $val) {
@@ -247,6 +303,8 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function createAction($request, $params = null)
     {
+        $this->need_privileges($request, $params);
+        $this->need_privileges_create_or_update($request, $params);
         $ns = $this->getModel('fonctions');
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         if (get_class($this) == 'CrudController') {
@@ -257,8 +315,8 @@ class crudCrudController extends crudCrudController_Parent
         $this->get_unquoted_gpc($params);
         // charge les metadonnees
         $to_merge = array();
-        $to_merge['tables']  = $this->_crud->tables;
-        $to_merge['metas']   = $this->_crud->metas;
+        $to_merge['tables'] = $this->_crud->tables;
+        $to_merge['metas'] = $this->_crud->metas;
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
@@ -302,16 +360,16 @@ class crudCrudController extends crudCrudController_Parent
             }
             // nettoie les valeurs postées
             $params['post'] = $this->sanitize($params['post']);
-            $validate_errs  = $this->validate($params['post'], $params['get']);
+            $validate_errs = $this->validate($params['post'], $params['get']);
             $move_errs = array();
             $uploaded_files = array();
             if (!count($validate_errs) && !count($errors)) {
                 if ($ns->ifGet('int', 'duplicate')) {
                     $params['duplicate'] = 1;
                 }
-                $result         = $this->handle_uploaded_files($params, $errors, 'create');
+                $result = $this->handle_uploaded_files($params, $errors, 'create');
                 $uploaded_files = $result['uploaded_files'];
-                $move_errs      = $result['move_errs'];
+                $move_errs = $result['move_errs'];
             }
             if (!count($validate_errs) && !count($errors) && !count($move_errs)) {
                 // enregistre les valeurs postees
@@ -326,8 +384,10 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // charge les donnees
-        $this->register_ui_scripts(true);
-        $values = array(0 => '');
+        $this->register_ui_scripts('create');
+        $values = array(
+            0 => ''
+        );
         foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
             $values[0][$tablefield] = '';
             if ($last_insert_ids) {
@@ -346,7 +406,9 @@ class crudCrudController extends crudCrudController_Parent
             $this->data['duplicate'] = 1;
             // charge les donnees
             // on ne passe pas de parametres supplementaires ici, c'est volontaire
-            $values = array(0 => $ns->array_first($this->_crud->getFromArray($params['get'])));
+            $values = array(
+                0 => $ns->array_first($this->_crud->getFromArray($params['get']))
+            );
             // TODO: pour le moment on ne duplique pas les fichiers uploadés, donc on vide les champs
             // TODO: il faudrait les copier (pour que l'element dupliqué travaille sur un fichier bien à lui)
             foreach ($this->data['fields'] as $nom => $champ) {
@@ -362,8 +424,8 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         $to_merge = array();
-        $to_merge['values']  = $values;
-        $to_merge['errors']  = $errors;
+        $to_merge['values'] = $values;
+        $to_merge['errors'] = $errors;
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
         // prise en compte des champs ajoutés
@@ -384,14 +446,6 @@ class crudCrudController extends crudCrudController_Parent
                 return $errors;
             }
         }
-        // how to hide fields
-        // $this->hideField($tablefield);
-        // how to map field names
-        // $this->mapFieldName($tablefield, 'Champ FIELD de la table TABLE');
-        // how to set field values
-        // $this->setFieldValues($tablefield, $values);
-        // how to hide view sections
-        // $this->hideSection('section');
         $this->alter_values($params);
         $this->alter_values_create_or_update($params);
     }
@@ -404,6 +458,8 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function readAction($request, $params = null)
     {
+        $this->need_privileges($request, $params);
+        $this->need_privileges_read($request, $params);
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
@@ -433,10 +489,10 @@ class crudCrudController extends crudCrudController_Parent
             $values = array();
         }
         $to_merge = array();
-        $to_merge['values']  = $values;
-        $to_merge['errors']  = $errors;
-        $to_merge['tables']  = $this->_crud->tables;
-        $to_merge['metas']   = $this->_crud->metas;
+        $to_merge['values'] = $values;
+        $to_merge['errors'] = $errors;
+        $to_merge['tables'] = $this->_crud->tables;
+        $to_merge['metas'] = $this->_crud->metas;
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
@@ -493,10 +549,6 @@ class crudCrudController extends crudCrudController_Parent
                 die();
             }
         }
-        // how to hide fields           : $this->hideField($tablefield);
-        // how to map field names       : $this->mapFieldName($tablefield, 'Champ FIELD de la table TABLE');
-        // how to set field values      : $this->setFieldValues($tablefield, $values);
-        // how to hide view sections    : $this->hideSection('section');
         $this->alter_values($params);
         $this->alter_values_read($params);
     }
@@ -509,6 +561,8 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function updateAction($request, $params = null)
     {
+        $this->need_privileges($request, $params);
+        $this->need_privileges_create_or_update($request, $params);
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
@@ -518,8 +572,8 @@ class crudCrudController extends crudCrudController_Parent
         $this->get_unquoted_gpc($params);
         // charge les metadonnees
         $to_merge = array();
-        $to_merge['tables']  = $this->_crud->tables;
-        $to_merge['metas']   = $this->_crud->metas;
+        $to_merge['tables'] = $this->_crud->tables;
+        $to_merge['metas'] = $this->_crud->metas;
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
@@ -562,13 +616,13 @@ class crudCrudController extends crudCrudController_Parent
             }
             // nettoie les valeurs postées
             $params['post'] = $this->sanitize($params['post']);
-            $validate_errs  = $this->validate($params['post'], $params['get']);
+            $validate_errs = $this->validate($params['post'], $params['get']);
             $move_errs = array();
             $uploaded_files = array();
             if (!count($validate_errs) && !count($errors)) {
-                $result         = $this->handle_uploaded_files($params, $errors);
+                $result = $this->handle_uploaded_files($params, $errors);
                 $uploaded_files = $result['uploaded_files'];
-                $move_errs      = $result['move_errs'];
+                $move_errs = $result['move_errs'];
             }
             if (!count($validate_errs) && !count($errors) && !count($move_errs)) {
                 // enregistre les valeurs postees
@@ -584,7 +638,7 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // charge les donnees
-        $this->register_ui_scripts(true);
+        $this->register_ui_scripts('update');
         // on ne passe pas de parametres supplementaires ici, c'est volontaire
         $values = $this->_crud->getFromArray($params['get']);
         if (!is_array($values) || (count($values) !== 1)) {
@@ -592,8 +646,8 @@ class crudCrudController extends crudCrudController_Parent
             $values = array();
         }
         $to_merge = array();
-        $to_merge['values']  = $values;
-        $to_merge['errors']  = $errors;
+        $to_merge['values'] = $values;
+        $to_merge['errors'] = $errors;
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
         // prise en compte des champs ajoutés
@@ -614,10 +668,6 @@ class crudCrudController extends crudCrudController_Parent
                 return $errors;
             }
         }
-        // how to hide fields           : $this->hideField($tablefield);
-        // how to map field names       : $this->mapFieldName($tablefield, 'Champ FIELD de la table TABLE');
-        // how to set field values      : $this->setFieldValues($tablefield, $values);
-        // how to hide view sections    : $this->hideSection('section');
         $this->alter_values($params);
         $this->alter_values_create_or_update($params);
     }
@@ -630,6 +680,8 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function deletetmpfileAction($request)
     {
+        $this->need_privileges($request, $params);
+        $this->need_privileges_deletetmpfile($request, $params);
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
@@ -650,7 +702,7 @@ class crudCrudController extends crudCrudController_Parent
             unlink(__FILES_ROOT__ . '/tmp/' . $filename);
             unset($_SESSION['crud_uploaded_files'][$sesskey]);
         }
-        return array('dont_getblock' => true);
+        return $this->dontGetBlock();
     }
 
     /**
@@ -661,6 +713,8 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function deleteAction($request, $params = null)
     {
+        $this->need_privileges($request, $params);
+        $this->need_privileges_delete($request, $params);
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
@@ -671,9 +725,9 @@ class crudCrudController extends crudCrudController_Parent
         $this->get_unquoted_gpc($params);
         // transmet les donnees
         $to_merge = array();
-        $to_merge['errors']  = $errors;
-        $to_merge['tables']  = $this->_crud->tables;
-        $to_merge['metas']   = $this->_crud->metas;
+        $to_merge['errors'] = $errors;
+        $to_merge['tables'] = $this->_crud->tables;
+        $to_merge['metas'] = $this->_crud->metas;
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
@@ -719,9 +773,194 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
+     * ======================================
+     * Customizations : affichage ou masquage
+     * ======================================
+     */
+
+    /**
+     * hideField : raccourci pour masquer un champ dans une vue
+     *             utilisable depuis le hook hide_fields
+     *
+     * @param mixed $tablefield : $table.$field à masquer
+     * @access public
+     * @return void
+     */
+    public function hideField($tablefield)
+    {
+        $this->data['metas']['hidden_fields'][$tablefield] = true;
+        return true;
+    }
+
+    /**
+     * hideFields : appelle hideField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
+     *              utilisable depuis le hook hide_fields
+     *
+     * @param mixed $tablefields : liste de $table.$field à masquer
+     * @access public
+     * @return void
+     */
+    public function hideFields($tablefields)
+    {
+        foreach ($tablefields as $tablefield) {
+            $this->hideField($tablefield);
+        }
+        return true;
+    }
+
+    /**
+     * unhideField : raccourci pour forcer l'affichage d'un champ dans une vue
+     *               utilisable depuis le hook hide_fields
+     *
+     * @param mixed $tablefield : $table.$field à afficher
+     * @access public
+     * @return void
+     */
+    public function unhideField($tablefield)
+    {
+        $this->data['metas']['hidden_fields'][$tablefield] = 0;
+        return true;
+    }
+
+    /**
+     * unhideFields : appelle unhideField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
+     *                utilisable depuis le hook hide_fields
+     *
+     * @param mixed $tablefields : liste de $table.$field dont forcer l'affichage
+     * @access public
+     * @return void
+     */
+    public function unhideFields($tablefields)
+    {
+        foreach ($tablefields as $tablefield) {
+            $this->unhideField($tablefield);
+        }
+        return true;
+    }
+
+    /**
+     * hideAllFields : masque tous les champs
+     *                 utilisable depuis le hook hide_fields
+     *
+     * @access public
+     * @return void
+     */
+    public function hideAllFields()
+    {
+        foreach ($this->_crud->fields as $key => $val) {
+            $this->data['metas']['hidden_fields'][$key] = true;
+        }
+        return true;
+    }
+
+    /**
+     * unhideAllFields : force l'affichage de tous les champs
+     *                   utilisable depuis le hook hide_fields
+     *
+     * @access public
+     * @return void
+     */
+    public function unhideAllFields()
+    {
+        foreach ($this->_crud->fields as $key => $val) {
+            $this->data['metas']['hidden_fields'][$key] = false;
+        }
+        return true;
+    }
+
+    /**
+     * setMandatoryField : raccourci pour rendre un champ obligatoire
+     *                     utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefield : $table.$field à rendre obligatoire
+     * @access public
+     * @return void
+     */
+    public function setMandatoryField($tablefield)
+    {
+        $this->data['metas']['mandatory_fields'][$tablefield] = true;
+        return true;
+    }
+
+    /**
+     * unsetMandatoryField : raccourci pour rendre un champ facultatif
+     *                       utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefield : $table.$field à rendre facultatif
+     * @access public
+     * @return void
+     */
+    public function unsetMandatoryField($tablefield)
+    {
+        $this->data['metas']['mandatory_fields'][$tablefield] = false;
+        return true;
+    }
+
+    /**
+     * setMandatoryFields : appelle setMandatoryField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
+     *                      utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefields : liste de $table.$field à rendre obligatoires
+     * @access public
+     * @return void
+     */
+    public function setMandatoryFields($tablefields)
+    {
+        foreach ($tablefields as $tablefield) {
+            $this->setMandatoryFields($tablefield);
+        }
+        return true;
+    }
+
+    /**
+     * unsetMandatoryFields : appelle unsetMandatoryField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
+     *                        utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefields : liste de $table.$field à rendre facultatifs
+     * @access public
+     * @return void
+     */
+    public function unsetMandatoryFields($tablefields)
+    {
+        foreach ($tablefields as $tablefield) {
+            $this->unsetMandatoryFields($tablefield);
+        }
+        return true;
+    }
+
+    /**
+     * setMandatoryAllFields : rend tous les champs obligatoires
+     *                         utilisable depuis le hook override_fields
+     *
+     * @access public
+     * @return void
+     */
+    public function setMandatoryAllFields()
+    {
+        foreach ($this->_crud->fields as $key => $val) {
+            $this->data['metas']['mandatory_fields'][$key] = true;
+        }
+        return true;
+    }
+
+    /**
+     * unsetMandatoryAllFields : rend tous les champs facultatifs
+     *                           utilisable depuis le hook override_fields
+     *
+     * @access public
+     * @return void
+     */
+    public function unsetMandatoryAllFields()
+    {
+        foreach ($this->_crud->fields as $key => $val) {
+            $this->data['metas']['mandatory_fields'][$key] = false;
+        }
+        return true;
+    }
+
+    /**
      * hideSection : raccourci pour masquer une section dans une vue
-     *               cette fonction s'appelle depuis le controleur de la vue,
-     *               apres avoir rempli le tableau $this->data
+     *               utilisable depuis le hook hide_sections
      *
      * @param mixed $section : nom de la section
      * @access public
@@ -740,82 +979,8 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * unhideSection : raccourci pour demasquer une section dans une vue
-     *                 cette fonction s'appelle depuis le controleur de la vue,
-     *                 apres avoir rempli le tableau $this->data
-     *
-     * @param mixed $section : nom de la section
-     * @access public
-     * @return void
-     */
-    public function unhideSection($section)
-    {
-        $this->data['hidden_sections'][$section] = 0;
-        return true;
-    }
-
-    /**
-     * hideField : raccourci pour masquer un champ dans une vue
-     *             cette fonction s'appelle depuis le controleur de la vue,
-     *             apres avoir rempli le tableau $this->data
-     *
-     * @param mixed $tablefield
-     * @access public
-     * @return void
-     */
-    public function hideField($tablefield)
-    {
-        $this->data['metas']['hidden_fields'][$tablefield] = true;
-        return true;
-    }
-
-    /**
-     * unhideField : raccourci pour demasquer un champ dans une vue
-     *               cette fonction s'appelle depuis le controleur de la vue,
-     *               apres avoir rempli le tableau $this->data
-     *
-     * @param mixed $tablefield
-     * @access public
-     * @return void
-     */
-    public function unhideField($tablefield)
-    {
-        $this->data['metas']['hidden_fields'][$tablefield] = 0;
-        return true;
-    }
-
-    /**
-     * hideAllFields : masque tous les champs
-     *
-     * @param mixed $tablefield
-     * @access public
-     * @return void
-     */
-    public function hideAllFields($tablefield)
-    {
-        foreach ($this->_crud->fields as $key => $val) {
-            $this->data['metas']['hidden_fields'][$key] = true;
-        }
-        return true;
-    }
-
-    /**
-     * unhideAllFields : demasque tous les champs
-     *
-     * @param mixed $tablefield
-     * @access public
-     * @return void
-     */
-    public function unhideAllFields($tablefield)
-    {
-        foreach ($this->_crud->fields as $key => $val) {
-            $this->data['metas']['hidden_fields'][$key] = false;
-        }
-        return true;
-    }
-
-    /**
      * hideSections : appelle hideSection pour plusieurs sections (permet de réunir les appels en un seul pour plus de lisibilité)
+     *                utilisable depuis le hook hide_sections
      *
      * @param mixed $sections
      * @access public
@@ -830,7 +995,22 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
+     * unhideSection : raccourci pour demasquer une section dans une vue
+     *                utilisable depuis le hook hide_sections
+     *
+     * @param mixed $section : nom de la section
+     * @access public
+     * @return void
+     */
+    public function unhideSection($section)
+    {
+        $this->data['hidden_sections'][$section] = 0;
+        return true;
+    }
+
+    /**
      * unhideSections : appelle unhideSection pour plusieurs sections (permet de réunir les appels en un seul pour plus de lisibilité)
+     *                  utilisable depuis le hook hide_sections
      *
      * @param mixed $sections
      * @access public
@@ -845,45 +1025,19 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * hideFields : appelle hideField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
-     *
-     * @param mixed $fields
-     * @access public
-     * @return void
+     * =======================================
+     * Customizations : champs supplementaires
+     * =======================================
      */
-    public function hideFields($fields)
-    {
-        foreach ($fields as $tablefield) {
-            $this->hideField($tablefield);
-        }
-        return true;
-    }
-
-    /**
-     * unhideFields : appelle unhideField pour plusieurs champs (permet de réunir les appels en un seul pour plus de lisibilité)
-     *
-     * @param mixed $fields
-     * @access public
-     * @return void
-     */
-    public function unhideFields($fields)
-    {
-        foreach ($fields as $tablefield) {
-            $this->unhideField($tablefield);
-        }
-        return true;
-    }
 
     /**
      * addField : ajoute un champ "virtuel", sans valeur mais qui sera utilisé
      *            dans la génération des formulaires
-     *            cette fonction s'appelle depuis le controleur de la vue,
-     *            apres avoir rempli le tableau $this->data
-     *            permet par exemple de rajouter des colonnes calculees dans la
-     *            page listing
+     *            utile pour rajouter des champs calcules dans la page listing
+     *            utilisable depuis le hook add_fields
      *
-     * @param mixed $tablefield : $table.$field
-     * @param mixed $before_tablefield : $table.$field
+     * @param mixed $tablefield : nom du champ virtuel sous la forme $table.$field
+     * @param mixed $before_tablefield : champ $table.$field avant lequel positionner le champ
      * @param mixed $fieldsmeta : tableau de meta informations sur le champ,
      *                            par exemple : array('type' => 'varchar',
                                                       'fieldvalues' => array('Foo' => 'foo',
@@ -913,8 +1067,10 @@ class crudCrudController extends crudCrudController_Parent
             );
         }
         if ($before_tablefield) {
-            list ($before_table, $before_field) = explode('.', $before_tablefield, 2);
-            if (!$ns->array_insert_before(array($tablefield => $fieldmeta), $this->data['fields'], $before_table . '.' . $before_field)) {
+            list($before_table, $before_field) = explode('.', $before_tablefield, 2);
+            if (!$ns->array_insert_before(array(
+                $tablefield => $fieldmeta
+            ) , $this->data['fields'], $before_table . '.' . $before_field)) {
                 $this->data['fields'][$tablefield] = $fieldmeta;
             }
         } else {
@@ -929,7 +1085,9 @@ class crudCrudController extends crudCrudController_Parent
                     $default_val = $fieldmeta['default_value'];
                 }
                 // si la cle avant laquelle on veut inserer n'est pas trouvee, on ajoute a la fin a la place
-                if (!$before_tablefield || !$ns->array_insert_before(array($tablefield => $default_val), $row, $before_table . '.' . $before_tablefield)) {
+                if (!$before_tablefield || !$ns->array_insert_before(array(
+                    $tablefield => $default_val
+                ) , $row, $before_table . '.' . $before_tablefield)) {
                     $row[$tablefield] = $default_val;
                 }
                 $this->data['values'][$key] = $row;
@@ -939,14 +1097,19 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
+     * ====================================
+     * Customizations : position des champs
+     * ====================================
+     */
+
+    /**
      * moveField : deplace un des champ utilisés pour la génération des
      *             formulaires dans l'entete et dans chacune des lignes du
      *             tableau de valeurs
-     *             cette fonction s'appelle depuis le controleur de la vue,
-     *             apres avoir rempli le tableau $this->data
+     *             utilisable depuis le hook move_fields
      *
      * @param mixed $tablefield : $table.$field
-     * @param mixed $before_tablefield : $table.$field
+     * @param mixed $before_tablefield : champ $table.$field avant lequel positionner le champ
      * @param mixed $type
      * @access public
      * @return void
@@ -960,7 +1123,9 @@ class crudCrudController extends crudCrudController_Parent
         if ($before_tablefield) {
             $val = $this->data['fields'][$tablefield];
             unset($this->data['fields'][$tablefield]);
-            if (!$ns->array_insert_before(array($tablefield => $fieldmeta), $this->data['fields'], $before_tablefield)) {
+            if (!$ns->array_insert_before(array(
+                $tablefield => $fieldmeta
+            ) , $this->data['fields'], $before_tablefield)) {
                 $this->data['fields'][$tablefield] = $fieldmeta;
             }
         } else {
@@ -972,11 +1137,33 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * mapFieldName : raccourci pour renommer un champ dans une vue
-     *                cette fonction s'appelle depuis le controleur de la vue,
-     *                apres avoir rempli le tableau $this->data
+     * ===================================
+     * Customizations : renomme des champs
+     * ===================================
+     */
+
+    /**
+     * getFieldName : raccourci pour récupérer le nom d'un champ
      *
-     * @param mixed $tablefield
+     * @param mixed $tablefield : $table.$field
+     * @param mixed $name
+     * @access public
+     * @return void
+     */
+    public function getFieldName($tablefield)
+    {
+        if (!empty($this->data['metas']['title_mapping'][$tablefield])) {
+            return $this->data['metas']['title_mapping'][$tablefield];
+        }
+        $field = preg_replace('/.*\./', '', $tablefield);
+        return ucfirst($field);
+    }
+
+    /**
+     * mapFieldName : raccourci pour renommer un champ dans une vue
+     *                utilisable depuis le hook rename_fields
+     *
+     * @param mixed $tablefield : $table.$field à renommer
      * @param mixed $name
      * @access public
      * @return void
@@ -989,12 +1176,11 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * unmapFieldName : raccourci pour annuler le renommage d'un champ dans une vue
-     *                  cette fonction s'appelle depuis le controleur de la vue,
-     *                  apres avoir rempli le tableau $this->data
+     *                  utilisable depuis le hook rename_fields
      *
-     * @param mixed $tablefield
-     * @param mixed $name : si différent de false, n'annule le renommage que
-     *                      s'il a la valeur $name
+     * @param mixed $tablefield : $table.$field dont on veut annuler le renommage
+     * @param mixed $name : si différent de false, on n'annulera le renommage que
+     *                      s'il a exactement la valeur $name
      * @access public
      * @return void
      */
@@ -1009,19 +1195,86 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * setFieldValues : raccourci pour donner les valeurs possibles d'un champ
-     *                  dans une vue, ce qui fait du champ un SELECT
-     *                  cette fonction s'appelle depuis le controleur de la vue,
-     *                  apres avoir rempli le tableau $this->data
+     * mapFieldNames : raccourci pour renommer plusieurs champs dans une vue
+     *                 utilisable depuis le hook rename_fields
      *
-     * @param mixed $tablefield
+     * @param mixed $tablefield_from_to : tableau associatif contenant FROM en clé, et TO en valeur
+     *                                    toujours au format $table.$field
+     * @access public
+     * @return void
+     */
+    public function mapFieldNames($tablefield_from_to)
+    {
+        foreach ($tablefield_from_to as $from => $to) {
+            $this->mapFieldName($from, $to);
+        }
+        return true;
+    }
+
+    //TODO: public function unmapFieldNames()
+
+    /**
+     * =====================================================
+     * Customizations : type, paramètres, valeurs des champs
+     * =====================================================
+     */
+
+    /**
+     * overrideField : forcer le type et les paramètres d'un champ
+     *                 utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefield : $table.$field
+     * @param mixed $type : type choisi dans le tableau $this->mapping_to_HTML
+     * @param mixed $parameters : tableau de paramètres spécifiques au type choisi
+     *      Par exemple pour un type 'file' on pourra avoir :
+     *      $parameters = array(
+     *          'max_filesize' => 10000000,
+     *          'extensions'   => array('jpg', 'pdf'),
+     *          'dest_dir'     => __FILES_ROOT__ . '/files/media',
+     *      );
+     * @access public
+     * @return void
+     */
+    public function overrideField($tablefield, $type = null, $parameters = null)
+    {
+        if (!empty($type)) {
+            $this->data['fields'][$tablefield]['type'] = $type;
+        }
+        if (!empty($parameters)) {
+            $ns = $this->getModel('fonctions');
+            $this->data['fields'][$tablefield][$parameters] = $ns->array_replace_recursive($this->data['fields'][$tablefield][$parameters], $parameters);
+        }
+        return true;
+    }
+
+    /**
+     * getFieldValues : raccourci pour récupérer les valeurs possibles d'un champ SELECT par exemple
+     *
+     * @param mixed $tablefield : $table.$field
+     * @param mixed $name
+     * @access public
+     * @return void
+     */
+    public function getFieldValues($tablefield)
+    {
+        if (!empty($this->data['fields'][$tablefield]['fieldvalues'])) {
+            return $this->data['fields'][$tablefield]['fieldvalues'];
+        }
+        return false;
+    }
+
+    /**
+     * setFieldValues : affectation des valeurs possibles d'un champ
+     *                  le champ sera affiché comme un SELECT
+     *                  utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefield : $table.$field
      * @param mixed $values
      * @access public
      * @return void
      */
     public function setFieldValues($tablefield, $values)
     {
-        list($table, $field) = explode('.', $tablefield, 2);
         if (isset($this->data['fields'][$tablefield])) {
             $this->data['fields'][$tablefield]['fieldvalues'] = $values;
             return true;
@@ -1032,8 +1285,7 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * unsetFieldValues : raccourci pour vider les valeurs possibles d'un champ
      *                    dans une vue, ce qui fait du champ un SELECT
-     *                    cette fonction s'appelle depuis le controleur de la vue,
-     *                    apres avoir rempli le tableau $this->data
+     *                    utilisable depuis le hook override_fields
      *
      * @param mixed $table
      * @param mixed $field
@@ -1051,8 +1303,89 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
+     * getFieldValue : récupérer la valeur affectée à un champ
+     *
+     * @param mixed $tablefield : $table.$field auquel affecter une valeur par défaut
+     * @access public
+     * @return void
+     */
+    public function getFieldValue($tablefield)
+    {
+        $ns = $this->getModel('fonctions');
+        $first_key = $ns->array_first_key($this->data['values']);
+        if (!empty($this->data['values'][$first_key][$tablefield])) {
+            return $this->data['values'][$first_key][$tablefield];
+        }
+        return false;
+    }
+
+    /**
+     * setDefaultValue : affecter une valeur par défaut à un champ
+     *                   utilisable depuis le hook alter_values
+     *
+     * @param mixed $tablefield : $table.$field auquel affecter une valeur par défaut
+     * @param mixed $default_value : valeur par défaut
+     * @access public
+     * @return void
+     */
+    public function setDefaultValue($tablefield, $default_value = '')
+    {
+        $ns = $this->getModel('fonctions');
+        $first_key = $ns->array_first_key($this->data['values']);
+        if (empty($this->data['values'][$first_key][$tablefield])) {
+            $this->data['values'][$first_key][$tablefield] = $default_value;
+        }
+        return $this->data['values'][$first_key][$tablefield];
+    }
+
+    /**
+     * renameOption : renomme une OPTION d'un champ SELECT
+     *                utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefield : $table.$field
+     * @param mixed $from
+     * @param mixed $to
+     * @access public
+     * @return void
+     */
+    public function renameOption($tablefield, $from, $to)
+    {
+        if (isset($this->data['fields'][$tablefield]['fieldvalues'][$from])) {
+            $this->data['fields'][$tablefield]['fieldvalues'][$from] = $to;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * renameOptions : raccourci pour renommer plusieurs options d'un champ SELECT
+     *                 utilisable depuis le hook override_fields
+     *
+     * @param mixed $tablefield : $table.$field à renommer
+     * @param mixed $from_to_array
+     * @access public
+     * @return void
+     */
+    public function renameOptions($tablefield, $from_to_array)
+    {
+        foreach ($from_to_array as $from => $to) {
+            if (isset($this->data['fields'][$tablefield]['fieldvalues'][$from])) {
+                $this->data['fields'][$tablefield]['fieldvalues'][$from] = $to;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * ===================================================
+     * Customizations : nettoyage et validation des champs
+     * ===================================================
+     */
+
+    /**
      * sanitize : filtre les valeurs du tableau $insecure_array
      *            renvoie le tableau filtré
+     *            hook destiné à être surchargée
      *
      * @param mixed $insecure_array
      * @access public
@@ -1068,6 +1401,7 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * validate : valide les donnees avant creation ou mise à jour
      *            renvoie un tableau listant les erreurs rencontrees
+     *            hook destiné à être surchargée
      *
      * @param mixed $insecure_values : tableau associatif 'table-champ' => 'valeur', par exemple $_POST
      * @param mixed $insecure_primary_key : tableau associatif 'table-champ' => 'valeur', par exemple $_GET
@@ -1077,8 +1411,59 @@ class crudCrudController extends crudCrudController_Parent
     public function validate($insecure_values, $insecure_primary_key = null)
     {
         // par défaut aucune validation : fonction destinée à être surchargée
-        return array();
+        foreach ($this->data['metas']['mandatory_fields'] as $tablefield => $is_mandatory) {
+            if ($is_mandatory) {
+                $my_errors = array();
+                $fieldkey = str_replace('.', '-', $tablefield);
+                if (!isset($insecure_values[$fieldkey]) || $insecure_values[$fieldkey] == '') {
+                    $my_errors[$fieldkey] = 'le champ ' . $this->getFieldName($tablefield) . ' est obligatoire';
+                }
+            }
+        }
+        return $my_errors;
     }
+
+    /**
+     * =============================
+     * Helpers : gestion des erreurs
+     * =============================
+     */
+
+    public function handle_errors($errors, $url_retour = null)
+    {
+        $request = $this->getRequest();
+        $ns = $this->getModel('fonctions');
+        if (!count($errors)) {
+            if (!$url_retour) {
+                $url_retour = __WWW__ . '/' . $this->_class . '/index?id=';
+            }
+            if ($request->AJAX) {
+                echo '2';
+                echo $url_retour;
+                return $this->dontGetBlock();
+            } else {
+                $ns->redirect($url_retour);
+            }
+        } else {
+            if ($request->AJAX) {
+                // valeur de retour pour AJAX
+                echo '1';
+                $this->getBlock($this->_class . '/errors', array(
+                    'errors' => $errors
+                ));
+                return $this->dontGetBlock();
+            } else {
+                $this->getBlock($this->_class . '/errors', array('errors' => $errors));
+                die();
+            }
+        }
+    }
+
+    /**
+     * =============================
+     * Helpers : gestion des uploads
+     * =============================
+     */
 
     public function handle_uploading(&$params, &$errors)
     {
@@ -1107,16 +1492,14 @@ class crudCrudController extends crudCrudController_Parent
                     define('__NO_DEBUG_DIV__', 1);
                 }
                 if (isset($fileslot['name'])) {
-                    if ((isset($fieldmeta['parameters']) && (isset($fieldmeta['parameters']['max_filesize']) && $fileslot['size'] <= $fieldmeta['parameters']['max_filesize']))
-                        || ($fileslot['size'] <= $default_upload_max_filesize)) {
+                    if ((isset($fieldmeta['parameters']) && (isset($fieldmeta['parameters']['max_filesize']) && $fileslot['size'] <= $fieldmeta['parameters']['max_filesize'])) || ($fileslot['size'] <= $default_upload_max_filesize)) {
                         $infosfichier = pathinfo($fileslot['name']);
-                        $filename_upload  = strtolower($infosfichier['filename']);
+                        $filename_upload = strtolower($infosfichier['filename']);
                         $extension_upload = strtolower($infosfichier['extension']);
                         $visiblename = $ns->urlize(basename($filename_upload)) . '.' . $extension_upload;
                         $fullname = uniqid() . '-' . $visiblename;
                         // $fullname = basename($fileslot['tmp_name']) . '.' . $extension_upload;
-                        if (!(isset($fieldmeta['parameters']) && isset($fieldmeta['parameters']['extensions']) && count($fieldmeta['parameters']['extensions']))
-                            || in_array($extension_upload, $fieldmeta['parameters']['extensions'])) {
+                        if (!(isset($fieldmeta['parameters']) && isset($fieldmeta['parameters']['extensions']) && count($fieldmeta['parameters']['extensions'])) || in_array($extension_upload, $fieldmeta['parameters']['extensions'])) {
                             if (move_uploaded_file($fileslot['tmp_name'], __FILES_ROOT__ . '/tmp/' . $fullname)) {
                                 // enregistre le fichier dans la liste des fichiers uploadés
                                 $_SESSION['crud_uploaded_files'][] = $fullname;
@@ -1128,7 +1511,7 @@ class crudCrudController extends crudCrudController_Parent
                                     echo ':';
                                     echo $visiblename;
                                     echo ':';
-                                    return array('dont_getblock' => true);
+                                    return $this->dontGetBlock();
                                 }
                             } else {
                                 $err = 'Problème lors du déplacement du fichier';
@@ -1136,7 +1519,7 @@ class crudCrudController extends crudCrudController_Parent
                                 if ($is_ajax_upload) {
                                     echo '1';
                                     echo $err;
-                                    return array('dont_getblock' => true);
+                                    return $this->dontGetBlock();
                                 }
                             }
                         } else {
@@ -1145,7 +1528,7 @@ class crudCrudController extends crudCrudController_Parent
                             if ($is_ajax_upload) {
                                 echo '1';
                                 echo $err;
-                                return array('dont_getblock' => true);
+                                return $this->dontGetBlock();
                             }
                         }
                     } else {
@@ -1154,7 +1537,7 @@ class crudCrudController extends crudCrudController_Parent
                         if ($is_ajax_upload) {
                             echo '1';
                             echo $err;
-                            return array('dont_getblock' => true);
+                            return $this->dontGetBlock();
                         }
                     }
                 } else {
@@ -1164,7 +1547,7 @@ class crudCrudController extends crudCrudController_Parent
                         if ($is_ajax_upload) {
                             echo '1';
                             echo $err;
-                            return array('dont_getblock' => true);
+                            return $this->dontGetBlock();
                         }
                     }
                 }
@@ -1250,7 +1633,7 @@ class crudCrudController extends crudCrudController_Parent
                                     if (!isset($thumb['dest_dir'])) {
                                         // pas de dossier destination demande, on le determine a partir des dimensions demandees et du dossier destdir d'origine
                                         if (isset($args['canevaswidth']) && isset($args['canevasheight'])) {
-                                            $thumb['dest_dir'] = $destdir . '/' . (int) $args['canevaswidth'] . 'x' . (int) $args['canevasheight'];
+                                            $thumb['dest_dir'] = $destdir . '/' . (int)$args['canevaswidth'] . 'x' . (int)$args['canevasheight'];
                                         } else {
                                             // on n'a pas fourni assez d'infos pour determiner le dossier de destination, tant pis pour cette miniature
                                             continue;
@@ -1287,46 +1670,27 @@ class crudCrudController extends crudCrudController_Parent
         }
         $retour = array(
             'uploaded_files' => $uploaded_files,
-            'move_errs' => $move_errs);
+            'move_errs' => $move_errs
+        );
         return $retour;
     }
 
-    public function handle_errors($errors, $url_retour = null)
-    {
-        $request = $this->getRequest();
-        $ns = $this->getModel('fonctions');
-        if (!count($errors)) {
-            if (!$url_retour) {
-                $url_retour = __WWW__ . '/' . $this->_class . '/index?id=';
-            }
-            if ($request->AJAX) {
-                echo '2';
-                echo $url_retour;
-                return array('dont_getblock' => true);
-            } else {
-                $ns->redirect($url_retour);
-            }
-        } else {
-            if ($request->AJAX) {
-                // valeur de retour pour AJAX
-                echo '1';
-                if ($this->canGetBlock($this->_class . '/errors')) {
-                    $this->getBlock($this->_class . '/errors', array('errors' => $errors));
-                } else {
-                    $this->getBlock('crud/errors', array('errors' => $errors));
-                }
-                return array('dont_getblock' => true);
-            } else {
-                print_r($errors);
-                die();
-            }
-        }
-    }
+    /**
+     * ================
+     * Helpers : autres
+     * ================
+     */
 
     public function merge_defaults($to_merge)
     {
         $ns = $this->getModel('fonctions');
-        $default_fields = array('errors', 'tables', 'fields', 'mapping', 'metas');
+        $default_fields = array(
+            'errors',
+            'tables',
+            'fields',
+            'mapping',
+            'metas'
+        );
         foreach ($default_fields as $field) {
             if (!isset($this->data[$field])) {
                 $this->data[$field] = array();
@@ -1389,7 +1753,10 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * reverse_translate_dates_gp :
+     * reverse_translate_dates_gp : recupere $_GET et $_POST dans le tableau $params si necessaire
+     *                              et traduit les formats de date 
+     *                              pour date de "d/m/Y" vers "Y-m-d"
+     *                              pour datetime de "d/m/Y H:i:s"" vers "Y-m-d H:i:s"
      *
      * @param mixed $params
      * @access public
@@ -1398,8 +1765,11 @@ class crudCrudController extends crudCrudController_Parent
     public function reverse_translate_dates_gp(&$params)
     {
         $ns = $this->getModel('fonctions');
-        foreach ($params as $gpc_name => &$gpc_vals) {
-            if (!in_array($gpc_name, array('get', 'post'))) {
+        foreach ($params as $gpc_name => & $gpc_vals) {
+            if (!in_array($gpc_name, array(
+                'get',
+                'post'
+            ))) {
                 continue;
             }
             foreach ($gpc_vals as $tablefield => &$val) {
@@ -1408,18 +1778,18 @@ class crudCrudController extends crudCrudController_Parent
                     $key = $tablefield_array[0] . '.' . $tablefield_array[1];
                     if (isset($this->data['fields'][$key]) && isset($this->data['fields'][$key]['type'])) {
                         if ($this->data['fields'][$key]['type'] == 'date') {
-                            list ($date) = explode(' ', $val, 2);
+                            list($date) = explode(' ', $val, 2);
                             if ($val) {
-                                list ($d, $m, $Y) = explode('/', $date, 3);
+                                list($d, $m, $Y) = explode('/', $date, 3);
                                 $val = $Y . '-' . $m . '-' . $d;
                             }
                         }
                         if ($this->data['fields'][$key]['type'] == 'datetime') {
                             if ($val) {
-                                list ($date, $time) = explode(' ', $val, 2);
+                                list($date, $time) = explode(' ', $val, 2);
                                 if ($date && $time) {
-                                    list ($d, $m, $Y) = explode('/', $date, 3);
-                                    list ($H, $i, $s) = explode(':', $time, 3);
+                                    list($d, $m, $Y) = explode('/', $date, 3);
+                                    list($H, $i, $s) = explode(':', $time, 3);
                                     $val = $Y . '-' . $m . '-' . $d . ' ' . $H . ':' . $i . ':' . $s;
                                 }
                             }
@@ -1431,41 +1801,83 @@ class crudCrudController extends crudCrudController_Parent
         return $params;
     }
 
-    public function register_ui_scripts($create_or_update = false)
+    /**
+     * register_ui_scripts : appels cssjs->register_*
+     *
+     * @param mixed $params
+     * @access public
+     * @return void
+     */
+    public function register_ui_scripts($mode = 'index')
     {
         $request = $this->getRequest();
         $cssjs = $this->getModel('cssjs');
         // jQuery and jQuery UI
         if (Clementine::$config['module_jstools']['use_google_cdn']) {
-            $cssjs->register_js('jquery', array('src' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'));
+            $cssjs->register_js('jquery', array(
+                'src' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
+            ));
         } else {
-            $cssjs->register_js('jquery', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/jquery/jquery.min.js'));
+            $cssjs->register_js('jquery', array(
+                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/jquery/jquery.min.js'
+            ));
         }
-        $cssjs->register_js('jquery-ui', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/jquery-ui/js/jquery-ui.custom.min.js'));
-        if ($create_or_update) {
+        $cssjs->register_js('jquery-ui', array(
+            'src' => __WWW_ROOT_JSTOOLS__ . '/skin/jquery-ui/js/jquery-ui.custom.min.js'
+        ));
+        if (in_array($mode, array('create', 'update'))) {
             // jquery.anytime
-            $cssjs->register_css('jquery.anytime',  array('src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimec.css'));
-            $cssjs->register_js('jquery.anytime',   array('src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimec.js'));
-            $cssjs->register_js('jquery.anytimetz', array('src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimetz.js'));
-            $cssjs->register_js('clementine_crud-anytimejs', array('src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/clementine_crud_anytime.js'));
-            $cssjs->register_foot('clementine_crud-anytime', $this->getBlockHtml('crud/js_anytime', $this->data));
+            $cssjs->register_css('jquery.anytime', array(
+                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimec.css'
+            ));
+            $cssjs->register_js('jquery.anytime', array(
+                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimec.js'
+            ));
+            $cssjs->register_js('jquery.anytimetz', array(
+                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimetz.js'
+            ));
+            $cssjs->register_js('clementine_crud-anytimejs', array(
+                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/clementine_crud_anytime.js'
+            ));
+            $cssjs->register_foot('clementine_crud-anytime', $this->getBlockHtml($this->_class . '/js_anytime', $this->data));
             // plupload : ajax upload
-            $cssjs->register_css('plupload_clementine', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload_clementine.css'));
-            $cssjs->register_js('plupload', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.js'));
-            $cssjs->register_js('plupload.i18n', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/i18n/' . $request->LANG . '.js'));
-            $cssjs->register_js('plupload.runtime.html5', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.html5.js'));
-            $cssjs->register_js('plupload.runtime.flash', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.flash.js'));
-            $cssjs->register_js('plupload.runtime.html4', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.html4.js'));
-            $cssjs->register_foot('clementine_crud-plupload', $this->getBlockHtml('crud/js_plupload', $this->data));
+            $cssjs->register_css('plupload_clementine', array(
+                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload_clementine.css'
+            ));
+            $cssjs->register_js('plupload', array(
+                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.js'
+            ));
+            $cssjs->register_js('plupload.i18n', array(
+                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/i18n/' . $request->LANG . '.js'
+            ));
+            $cssjs->register_js('plupload.runtime.html5', array(
+                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.html5.js'
+            ));
+            $cssjs->register_js('plupload.runtime.flash', array(
+                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.flash.js'
+            ));
+            $cssjs->register_js('plupload.runtime.html4', array(
+                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.html4.js'
+            ));
+            $cssjs->register_foot('clementine_crud-plupload', $this->getBlockHtml($this->_class . '/js_plupload', $this->data));
+            //validation AJAX
+            $cssjs->register_foot('valid_' . $mode . '_ajax', $this->getBlockHtml($this->_class . '/valid_' . $mode . '_ajax', $this->data));
+            $cssjs->register_css('valid_' . $mode . '_css', array(
+                'src' => __WWW_ROOT_CRUD__ . '/skin/css/clementine_crud.css'
+            ));
         }
         // table hover effects
-        $cssjs->register_foot('clementine_crud-list_table_hover', $this->getBlockHtml('crud/js_list_table_hover', $this->data));
+        $cssjs->register_foot('clementine_crud-list_table_hover', $this->getBlockHtml($this->_class . '/js_list_table_hover', $this->data));
         // dataTables : sortable tables
-        $cssjs->register_css('jquery.dataTables',  array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/js/jquery.dataTables/dataTables.css'));
-        $cssjs->register_js('jquery.dataTables', array('src' => __WWW_ROOT_JSTOOLS__ . '/skin/js/jquery.dataTables/jquery.dataTables.min.js'));
-        $cssjs->register_foot('clementine_crud-datatables', $this->getBlockHtml('crud/js_datatables', $this->data));
+        $cssjs->register_css('jquery.dataTables', array(
+            'src' => __WWW_ROOT_JSTOOLS__ . '/skin/js/jquery.dataTables/dataTables.css'
+        ));
+        $cssjs->register_js('jquery.dataTables', array(
+            'src' => __WWW_ROOT_JSTOOLS__ . '/skin/js/jquery.dataTables/jquery.dataTables.min.js'
+        ));
+        $cssjs->register_foot('clementine_crud-datatables', $this->getBlockHtml($this->_class . '/js_datatables', $this->data));
         // alert on delbutton
-        $cssjs->register_foot('clementine_crud-delbutton_confirm', $this->getBlockHtml('crud/js_delbutton_confirm', $this->data));
+        $cssjs->register_foot('clementine_crud-delbutton_confirm', $this->getBlockHtml($this->_class . '/js_delbutton_confirm', $this->data));
     }
 
     /**
@@ -1504,20 +1916,26 @@ class crudCrudController extends crudCrudController_Parent
                 if (isset($metas['custom_search'][$champ_affiche])) {
                     if ($metas['custom_search'][$champ_affiche] != '0') {
                         // si le custom_field est un GROUP_CONCAT par exemple, on ne peut pas faire un like directement sur GROUP_CONCAT(monchamp), donc on le fait directement sur monchamp
-                        $filter_where .= "\n    " . $metas['custom_search'][$champ_affiche] . " LIKE '%" . $db->escape_string($sSearch) . "%' OR ";
+                        $filter_where.= "\n    " . $metas['custom_search'][$champ_affiche] . " LIKE '%" . $db->escape_string($sSearch) . "%' OR ";
                         // recherche aussi la version encodée en HTML
-                        $filter_where .= "\n    " . $metas['custom_search'][$champ_affiche] . " LIKE '%" . $db->escape_string($ns->htmlentities($sSearch, ENT_QUOTES)) . "%' OR ";
+                        $filter_where.= "\n    " . $metas['custom_search'][$champ_affiche] . " LIKE '%" . $db->escape_string($ns->htmlentities($sSearch, ENT_QUOTES)) . "%' OR ";
                     }
                 } else {
-                    $filter_where .= "\n    " . $nom_champ_affiche . " LIKE '%" . $db->escape_string($sSearch) . "%' OR ";
+                    $filter_where.= "\n    " . $nom_champ_affiche . " LIKE '%" . $db->escape_string($sSearch) . "%' OR ";
                     // recherche aussi la version encodée en HTML
-                    $filter_where .= "\n    " . $nom_champ_affiche . " LIKE '%" . $db->escape_string($ns->htmlentities($sSearch, ENT_QUOTES)) . "%' OR ";
+                    $filter_where.= "\n    " . $nom_champ_affiche . " LIKE '%" . $db->escape_string($ns->htmlentities($sSearch, ENT_QUOTES)) . "%' OR ";
                 }
             }
             $filter_where = substr($filter_where, 0, -3);
         }
         return $filter_where;
     }
+
+    /**
+     * =====================================
+     * Hooks pour centraliser les surcharges
+     * =====================================
+     */
 
     /**
      * override_fields : surcharge les types de champs
@@ -1527,11 +1945,11 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function override_fields($params = null)
     {
-        /*$this->data['fields']['table.field']['type']                       = 'file';*/
-        /*$this->data['fields']['table.field']['parameters']                 = array();*/
-        /*$this->data['fields']['table.field']['parameters']['max_filesize'] = 10000000;*/
-        /*$this->data['fields']['table.field']['parameters']['extensions']   = array('jpg', 'pdf');*/
-        /*$this->data['fields']['table.field']['parameters']['dest_dir']     = __FILES_ROOT__ . '/files/media';*/
+        /*$this->overrideField('table.field', 'file', array(*/
+            /*'max_filesize' => 10000000,*/
+            /*'extensions'   => array('jpg', 'pdf'),*/
+            /*'dest_dir'     => __FILES_ROOT__ . '/files/media',*/
+        /*));*/
     }
 
     public function override_fields_index($params = null)
@@ -1548,9 +1966,8 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * alter_values : fonctions appelee par indexAction, updateAction et readAction
-     *                pour passer sur toutes les valeurs chargees et les modifier avant
-     *                de les transmettre à la vue. Pour changer le format d'une date, etc...
-     *                NOTE : pas idéal niveau performances
+     *                pour modifier les valeurs chargees AVANT de les transmettre
+     *                à la vue. Pour changer le format d'une date, etc...
      *
      * @param mixed $params
      * @access public
@@ -1647,7 +2064,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * move_fields : fonction appellée par index, creation, read, et update
-     *               pour ajouter des champs par des appels a moveField
+     *               pour déplacer des champs par des appels a moveField
      *
      * @param mixed $params
      * @access public
@@ -1693,5 +2110,36 @@ class crudCrudController extends crudCrudController_Parent
     {
     }
 
+    /**
+     * need_privileges : fonction appellée par tous les controleurs de type *Action
+     *                   pour protéger ces pages
+     *
+     * @param mixed $params
+     * @access public
+     * @return void
+     */
+    public function need_privileges($request = null, $params = null)
+    {
+    }
+
+    public function need_privileges_index($request = null, $params = null)
+    {
+    }
+
+    public function need_privileges_create_or_update($request = null, $params = null)
+    {
+    }
+
+    public function need_privileges_read($request = null, $params = null)
+    {
+    }
+
+    public function need_privileges_delete($request = null, $params = null)
+    {
+    }
+
+    public function need_privileges_deletetmpfile($request = null, $params = null)
+    {
+    }
+
 }
-?>

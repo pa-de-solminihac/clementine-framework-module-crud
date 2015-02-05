@@ -1,15 +1,7 @@
 <?php
 if (!empty($data['errors']) && !(isset($data['hidden_sections']['errors']) && ($data['hidden_sections']['errors']))) {
     if ($request->AJAX) {
-        // si requete AJAX : affichage des erreurs dans une alerte JS
-        $message = "Merci de vérifier les points suivants : ";
-        if (!empty($data['errors']['error_title'])) {
-            $message = $data['errors']['error_title'];
-            unset($data['errors']['error_title']);
-            $message .= "\r\n- ";
-        }
-        $message .= implode("\r\n- ", $data['errors']);
-        echo $message;
+        echo json_encode($data['errors']);
     } else {
         // si requete classique : affichage des erreurs dans la page
 ?>
@@ -38,4 +30,3 @@ if (!empty($data['errors']) && !(isset($data['hidden_sections']['errors']) && ($
 <?php
     }
 }
-?>

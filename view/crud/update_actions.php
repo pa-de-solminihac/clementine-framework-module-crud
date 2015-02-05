@@ -15,4 +15,3 @@ if (!(isset($data['alldata']['hidden_sections']['delbutton']) && ($data['alldata
 <a class="clementine_crud-update-delbutton delbutton" href="<?php echo __WWW__ . '/' . $data['alldata']['class'] . '/delete?' . $ns->htmlentities($data['current_key']); ?>">Supprimer</a>
 <?php
 }
-?>

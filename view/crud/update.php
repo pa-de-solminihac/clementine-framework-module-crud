@@ -78,4 +78,3 @@ if (is_array($data['values']) && (count($data['values']) == 1)) {
 <?php
     }
 }
-?>

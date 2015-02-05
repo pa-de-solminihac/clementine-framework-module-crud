@@ -35,4 +35,3 @@ $this->getBlock($data['class'] . '/read_fields', array('current_key' => $current
 <?php
     }
 }
-?>

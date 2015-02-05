@@ -189,4 +189,3 @@ if (isset($data['return_json']) && $data['return_json']) {
         echo json_encode($output);
     }
 }
-?>

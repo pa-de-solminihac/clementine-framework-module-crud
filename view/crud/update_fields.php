@@ -32,6 +32,9 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
 ?>
     <input type="hidden" id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>" value="<?php echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $htmlval); ?>" />
 <?php
+                    if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                        echo ' required ';
+                    }
                 } else {
 ?>
         <tr class="clementine_crud-<?php echo $data['alldata']['formtype']; ?>-row-<?php echo $field_class; ?>">
@@ -45,6 +48,9 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
 ?>
                 <label for="<?php echo $field_class; ?>">
 <?php
+                        }
+                        if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                            echo '<span class="clementine_crud-' . $data['alldata']['formtype'] . '-required_field">*</span> ';
                         }
                         if (isset($data['alldata']['metas']['title_mapping'][$tablefield])) {
                             echo $data['alldata']['metas']['title_mapping'][$tablefield];
@@ -70,22 +76,43 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 break;
                             case 'checkbox':
 ?>
-    <input type="hidden" id="<?php echo $field_class; ?>-hidden" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-hidden" value="0" />
+    <input type="hidden" id="<?php echo $field_class; ?>-hidden" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-hidden" value="0" 
+<?php
+                                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                    echo ' required ';
+                                }
+?>
+/>
     <input type="checkbox" id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>" value="1"
 <?php
-                            if ($htmlval) {
+                                if ($htmlval) {
 ?>
     checked="checked"
 <?php
-                            }
+                                }
+                                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                    echo ' required ';
+                                }
 ?> />
 <?php
                                 break;
                             case 'file':
 ?>
-    <input type="hidden" id="<?php echo $field_class; ?>-hidden" name="<?php echo $field_class; ?>-hidden" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-hidden" value="<?php echo $htmlval; ?>" />
+    <input type="hidden" id="<?php echo $field_class; ?>-hidden" name="<?php echo $field_class; ?>-hidden" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-hidden" value="<?php echo $htmlval; ?>" 
+<?php
+                                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                    echo ' required ';
+                                }
+?>
+/>
     <span id="<?php echo $field_class; ?>-uplcontainer" class="clementine_crud-plupload_container">
-        <input type="file" id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>" />
+    <input type="file" id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>"
+<?php
+                                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                    echo ' required ';
+                                }
+?>
+/>
     </span>
 <?php
 
@@ -127,14 +154,26 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     <a href="<?php echo $read_file_url; ?>" id="<?php echo $field_class; ?>-getfile" target="_blank" class="plupload_getfile">voir <?php echo $visiblename; ?></a>
     <a href="" id="<?php echo $field_class; ?>-after" class="plupload_finished" style="display: none; ">supprimer</a>
     <span id="<?php echo $field_class; ?>-removecontainer">
-    <input type="checkbox" id="<?php echo $field_class; ?>-remove" name="<?php echo $field_class; ?>-remove" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-remove" value="1" /> supprimer
+    <input type="checkbox" id="<?php echo $field_class; ?>-remove" name="<?php echo $field_class; ?>-remove" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>-remove" value="1" 
+<?php
+                                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                    echo ' required ';
+                                }
+?>
+/> supprimer
     </span>
 <?php
                                 }
                                 break;
                             case 'textarea':
 ?>
-                <textarea id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?> <?php echo $class; ?>"><?php echo $htmlval; ?></textarea>
+                <textarea id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?> <?php echo $class; ?>"
+<?php
+                                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                    echo ' required ';
+                                }
+?>
+><?php echo $htmlval; ?></textarea>
 <?php
                                 break;
                             default:
@@ -150,13 +189,22 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     checked="checked"
 <?php
     }
+    if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+        echo ' required ';
+    }
 ?> />
-<label for="<?php echo $field_class . '-' . $i; ?>"><?php echo $fieldkey; ?></label>
+<label for="<?php echo $field_class . '-' . $i; ?>"><?php echo $fieldval; ?></label>
 <?php
                                         }
                                     } else {
 ?>
-                <select id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>">
+                <select id="<?php echo $field_class; ?>" name="<?php echo $field_class; ?>" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>"
+<?php
+                                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                    echo ' required ';
+                                }
+?>
+>
 <?php
                                         foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
 ?>
@@ -176,8 +224,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 } else {
 ?>
                 <input type="<?php
-                                    if ($mapping == 'password') {
-                                        echo 'password';
+                                    //'date', 'time', and 'datetime' are currently handled by AnyTime picker which is not compatible with html5 equivalent input fields
+                                    if (in_array($mapping, array('password', 'tel', 'url', 'email', 'search', 'month', 'week', 'number', 'range', 'color'))) {
+                                        echo $mapping;
+                                    } elseif ($mapping == 'span') {
+                                        echo "hidden";
                                     } else {
                                         echo 'text';
                                     }
@@ -185,8 +236,16 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                 if (!empty($fieldmeta['size'])) {
                     echo 'maxlength="' . $fieldmeta['size'] . '" ';
                 }
-                ?> />
+                if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                    echo ' required ';
+                }
+?> />
 <?php
+                                    if ($mapping == 'span') {
+?>
+    <span id="<?php echo $field_class; ?>-span" name="<?php echo $field_class; ?>-span" class="clementine_crud-<?php echo $data['alldata']['formtype'] . '_type-' . $fieldmeta['type']; ?>" ><?php echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $htmlval); ?></span>
+<?php
+                                    }
                                 }
                                 break;
                         }
@@ -213,4 +272,3 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
         }
     }
 }
-?>

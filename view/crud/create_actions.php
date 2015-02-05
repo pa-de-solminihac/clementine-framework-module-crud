@@ -9,4 +9,3 @@
 <a class="clementine_crud-create-backbutton backbutton" href="<?php echo __WWW__ . '/' . $data['alldata']['class']; ?>">Retour</a>
 <?php
     }
-?>

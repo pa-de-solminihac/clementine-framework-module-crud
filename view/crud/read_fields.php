@@ -77,4 +77,3 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
         }
     }
 }
-?>
