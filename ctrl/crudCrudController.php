@@ -1242,7 +1242,10 @@ class crudCrudController extends crudCrudController_Parent
         }
         if (!empty($parameters)) {
             $ns = $this->getModel('fonctions');
-            $this->data['fields'][$tablefield][$parameters] = $ns->array_replace_recursive($this->data['fields'][$tablefield][$parameters], $parameters);
+            if (!isset($this->data['fields'][$tablefield]['parameters'])) {
+                $this->data['fields'][$tablefield]['parameters'] = array();
+            }
+            $this->data['fields'][$tablefield]['parameters'] = $ns->array_replace_recursive($this->data['fields'][$tablefield]['parameters'], $parameters);
         }
         return true;
     }
