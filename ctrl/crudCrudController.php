@@ -678,7 +678,7 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function deletetmpfileAction($request)
+    public function deletetmpfileAction($request, $params = null)
     {
         $this->need_privileges($request, $params);
         $this->need_privileges_deletetmpfile($request, $params);
