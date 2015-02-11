@@ -712,7 +712,13 @@ class crudCrudModel extends crudCrudModel_Parent
         $secure_array = array();
         if (isset($insecure_array)) {
             foreach ($insecure_array as $key => $val) {
-                $secure_array[$key] = $ns->strip_tags($val);
+                if (is_array($val)) {
+                    foreach ($val as $subkey => $subval) {
+                        $secure_array[$key][$subkey] = $ns->strip_tags($subval);
+                    }
+                } else {
+                    $secure_array[$key] = $ns->strip_tags($val);
+                }
             }
         }
         return $secure_array;
