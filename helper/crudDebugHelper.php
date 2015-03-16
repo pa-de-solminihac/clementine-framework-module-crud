@@ -1,33 +1,13 @@
 <?php
 class crudDebugHelper extends crudDebugHelper_Parent
 {
-    public function crud_constructor ()
-    {
-        if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
-            $this->trigger_error("Crud constructor : \$this->tables ne doit pas être vide. Surchargez la fonction _init du modèle... ", E_USER_ERROR, 1);
-        }
-        die();
-    }
+    //public function missing_wrapper_id($opening_html_tag, $from_fieldkey, $to_fieldkey)
+    //{
+        //$this->trigger_error("CRUD wrapping missing wrapper id: attribut \"id\" manquant dans le code HTML du wrapper : " . $opening_html_tag, E_USER_ERROR, 1);
+    //}
 
-    public function crud_missing_primary_key ($table, $field)
+    public function unknown_field($fieldkey)
     {
-        if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
-            $this->trigger_error("Crud missing primary key : " . $table . '.' . $field, E_USER_ERROR, 3);
-        }
-        die();
-    }
-
-    public function crud_incomplete_key ()
-    {
-        if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
-            $this->trigger_error("Crud incomplete key", E_USER_WARNING, 3);
-        }
-    }
-
-    public function unknown_element ()
-    {
-        if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
-            $this->trigger_error("Crud unknown element : cet élément n'existe pas ou n'est pas accessible ", E_USER_WARNING, 1);
-        }
+        $this->trigger_error("CRUD wrapping unknown field: cet élément n'existe pas dans \$this->data['fields'] : " . $fieldkey, E_USER_ERROR, 1);
     }
 }

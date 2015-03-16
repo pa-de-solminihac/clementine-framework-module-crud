@@ -1,13 +1,16 @@
 <?php
 $ns = $this->getModel('fonctions');
-if (!isset($data['alldata']['formtype'])) {
-    $data['alldata']['formtype'] = 'read';
-}
 $row = array();
 if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
             <tr>
 <?php
+}
+if ($data['alldata']['formtype'] != 'none') {
+    $href = __WWW__ . '/' . $data['alldata']['class'] . '/' . $data['alldata']['formtype'] . '?' . $ns->htmlentities($data['current_key']);
+    foreach ($data['alldata']['url_parameters'] as $key => $val) {
+        $href = $ns->add_param($href, $key, $val, 1);
+    }
 }
 foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     if (array_key_exists($tablefield, $data['ligne'])) { // array_key_exists !== isset
@@ -40,7 +43,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             'current_key' => $data['current_key'],
                             'ligne' => $data['ligne'],
                             'data' => $data['alldata']
-                        ));
+                        ), $request);
                         if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
                             echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $out);
                         } else {
@@ -57,7 +60,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                         } else {
                             $out = '';
                             if ($data['alldata']['formtype'] != 'none') {
-                                $out = '<a href="' . __WWW__ . '/' . $data['alldata']['class'] . '/' . $data['alldata']['formtype'] . '?' . $ns->htmlentities($data['current_key']) . '">';
+                                $out = '<a href="' . $href . '">';
                             }
                             switch ($mapping) {
                             case 'checkbox':
@@ -68,11 +71,19 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 }
                                 break;
 
+                            case 'date':
+                            case 'time':
+                            case 'datetime':
+                                if (!empty($data['ligne'][$tablefield]) && false === strpos($data['ligne'][$tablefield], '0000-00-00')) {
+                                    $out.= strftime($data['alldata']['date_format'], strtotime($data['ligne'][$tablefield]));
+                                }
+                                break;
+
                             default:
                                 if (!empty($fieldmeta['fieldvalues']) && isset($fieldmeta['fieldvalues'][$data['ligne'][$tablefield]])) {
                                     $out.= $fieldmeta['fieldvalues'][$data['ligne'][$tablefield]];
                                 } else {
-                                    $out.= $ns->htmlentities($ns->truncate($data['ligne'][$tablefield], 50));
+                                    $out.= $ns->htmlentities($ns->truncate($data['ligne'][$tablefield], 250));
                                 }
                                 break;
                             }
@@ -100,7 +111,7 @@ $out = $this->getBlockHtml($data['alldata']['class'] . '/index_actions', array(
     'current_key' => $data['current_key'],
     'ligne' => $data['ligne'],
     'alldata' => $data['alldata']
-));
+), $request);
 if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
             <td>

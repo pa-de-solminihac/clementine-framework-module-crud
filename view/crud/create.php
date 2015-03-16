@@ -1,45 +1,9 @@
 <?php
-$data['formtype'] = 'create';
-$this->getBlock($data['class'] . '/errors', $data);
-foreach ($data['values'] as $current_key => $ligne) {
-?>
-<form class="clementine_crud-create_form clementine_crud-form" action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">
-    <table class="clementine_crud-create_table">
-<?php
-    if (!(isset($data['hidden_sections']['thead']) && ($data['hidden_sections']['thead']))) {
-?>
-        <thead>
-            <tr>
-<?php
-        if (!(isset($data['hidden_sections']['names']) && ($data['hidden_sections']['names']))) {
-?>
-                <th class="clementine_crud-<?php echo $data['formtype']; ?>-title_column">Champ</th>
-<?php
-        }
-        if (!(isset($data['hidden_sections']['values']) && ($data['hidden_sections']['values']))) {
-?>
-                <th class="clementine_crud-<?php echo $data['formtype']; ?>-value_column">Valeur</th>
-<?php
-        }
-?>
-            </tr>
-        </thead>
-<?php
-    }
-?>
-        <tbody>
-<?php
-if (is_array($data['values']) && (count($data['values']) == 1)) {
-    foreach ($data['values'] as $current_key => $ligne) {
-        $this->getBlock($data['class'] . '/create_fields', array('current_key' => $current_key, 'ligne' => $ligne, 'alldata' => $data));
-    }
+if (!$request->AJAX && empty($data['is_iframe']) && empty($data['hidden_sections']['header'])) {
+    $this->getBlock($data['class'] . '/header-' . $data['formtype'], $data, $request);
 }
-?>
-        </tbody>
-    </table>
-<?php
-    $this->getBlock($data['class'] . '/create_actions', array('current_key' => $current_key, 'ligne' => $ligne, 'alldata' => $data));
-?>
-</form>
-<?php
+$this->getBlock($data['class'] . '/errors', $data, $request);
+$this->getBlock($data['class'] . '/' . $data['formtype'] . '_content', $data, $request);
+if (!$request->AJAX && empty($data['is_iframe']) && empty($data['hidden_sections']['footer'])) {
+    $this->getBlock($data['class'] . '/footer-' . $data['formtype'], $data, $request);
 }

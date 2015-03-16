@@ -1,3 +1,6 @@
+<?php
+$ns = $this->getModel('fonctions');
+?>
 <script type="text/javascript">
     // si jQuery est chargé
     if (typeof(jQuery) != "undefined") {
@@ -24,7 +27,7 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                 }
                 uploader_<?php echo $rand; ?> = new plupload.Uploader({
                     runtimes : 'html5,flash,html4',
-                    flash_swf_url : '<?php echo __WWW_ROOT_JSTOOLS__; ?>/skin/plupload/plupload.flash.swf',
+                    flash_swf_url : '<?php echo __WWW_ROOT_PLUPLOAD__; ?>/skin/js/Moxie.swf',
                     browse_button : '<?php echo $browsebutton; ?>',
                     container : '<?php echo $browsebutton; ?>-uplcontainer',
 <?php
@@ -53,7 +56,7 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                     init: {
                         FilesAdded: function(up, file) {
                             if (!jQuery('#<?php echo $browsebutton; ?>-after').length) {
-                                jQuery('#<?php echo $browsebutton; ?>').after(' <a href="" id="<?php echo $browsebutton; ?>-after" class="plupload_finished" />');
+                                jQuery('#<?php echo $browsebutton; ?>').after(' <a href="" id="<?php echo $browsebutton; ?>-after" class="plupload_finished delbutton" />');
                             }
                             jQuery('#<?php echo $browsebutton; ?>-after').html("en cours");
                             jQuery('#<?php echo $browsebutton; ?>-after').attr('href', '');
@@ -82,18 +85,32 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                                 var temp_name = noms[0];
                                 var orig_name = noms[1];
                                 jQuery('#<?php echo $browsebutton; ?>-infoscontainer').hide();
-                                jQuery('#<?php echo $browsebutton; ?>-after').attr('href', '<?php echo __WWW__ . '/' . $data['class'] . '/deletetmpfile?file='; ?>' + temp_name);
-                                jQuery('#<?php echo $browsebutton; ?>-after').html('supprimer le fichier ' + orig_name);
+<?php
+    $href = __WWW__ . '/' . $data['class'] . '/deletetmpfile?';
+    foreach ($data['url_parameters'] as $key => $val) {
+        $href = $ns->add_param($href, $key, $val, 1);
+    }
+    $href = $ns->mod_param($href, 'file', '');
+?>
+                                jQuery('#<?php echo $browsebutton; ?>-after').attr('href', '<?php echo $href; ?>' + temp_name);
+                                jQuery('#<?php echo $browsebutton; ?>-after').html('<i class="glyphicon glyphicon-trash"></i> supprimer <em>' + orig_name + '</em>');
                                 // transmision du nom de fichier
                                 jQuery('#<?php echo $browsebutton; ?>-hidden').val(temp_name);
                                 // masque le champ upload autrement car le hide() plante le positionnement du flash sous IE
                                 jQuery('#<?php echo $browsebutton; ?>').css('position', 'absolute');
                                 jQuery('#<?php echo $browsebutton; ?>').css('zIndex', '-1');
                                 jQuery('#<?php echo $browsebutton; ?>').css('visibility', 'hidden');
-                                jQuery('#<?php echo $browsebutton; ?>-uplcontainer > .plupload:first').css('position', 'absolute');
-                                jQuery('#<?php echo $browsebutton; ?>-uplcontainer > .plupload:first').css('zIndex', '-2');
+                                jQuery('#<?php echo $browsebutton; ?>-uplcontainer > .moxie-shim:first').css('position', 'absolute');
+                                jQuery('#<?php echo $browsebutton; ?>-uplcontainer > .moxie-shim:first').css('zIndex', '-2');
+                                //TODO: vérifier si form:first fonctionne toujours depuis la MAJ de plupload... notamment sous IE
                                 jQuery('#<?php echo $browsebutton; ?>-uplcontainer > form:first').css('position', 'absolute');
                                 jQuery('#<?php echo $browsebutton; ?>-uplcontainer > form:first').css('zIndex', '-2');
+                                try {
+                                    document.getElementById('<?php echo $browsebutton; ?>').setCustomValidity('');
+                                } catch (e) {
+                                    // nothing
+                                }
+                                //console.log('removed from <?php echo $browsebutton; ?>');
                                 if ((plupload_crudform.data('automatic_submit') != undefined) && (plupload_crudform.data('automatic_submit') == true)) {
                                     plupload_crudform.submit();
                                 }
@@ -119,9 +136,38 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                         }
                     }
                 });
-                jQuery('#<?php echo $browsebutton; ?>').hover(function () {
-                    jQuery('#<?php echo $browsebutton; ?>').unbind('hover');
+                //on ne doit pas pouvoir l'ouvrir depuis le clavier car on veut avoir le mouseenter !
+                jQuery('#<?php echo $browsebutton; ?>').attr('tabindex', '-1');
+                //validation faite en AJAX... on évite les conflits avec plupload
+                try {
+                    jQuery('#<?php echo $browsebutton; ?>').get(0).setCustomValidity('');
+                } catch (e) {
+                    // nothing
+                }
+                jQuery('[id^=<?php echo $browsebutton; ?>]').each(function() {
+                    jQuery(this).removeAttr('required');
+                    if (this.validationMessage) {
+                        try {
+                            this.setCustomValidity('');
+                        } catch (e) {
+                            // nothing
+                        }
+                    }
+                });
+                jQuery('#<?php echo $browsebutton; ?>').on('mouseenter.clementine-crud-plupload', function () {
+                    jQuery('#<?php echo $browsebutton; ?>').off('mouseenter.clementine-crud-plupload');
                     uploader_<?php echo $rand; ?>.init();
+                    jQuery('#<?php echo $browsebutton; ?>').removeAttr('required');
+                    jQuery('[id^=<?php echo $browsebutton; ?>]').each(function() {
+                        jQuery(this).removeAttr('required');
+                        if (this.validationMessage) {
+                            try {
+                                this.setCustomValidity('');
+                            } catch (e) {
+                                // nothing
+                            }
+                        }
+                    });
                     return false;
                 });
             }
@@ -145,7 +191,7 @@ foreach ($data['fields'] as $tablefield => $fieldmeta) {
                 });
 
                 // plupload_finished onclick
-                jQuery(document).delegate('a.plupload_finished', 'click', function() {
+                jQuery(document).on('click', 'a.plupload_finished', function() {
                     var this_id = jQuery(this).attr('id');
                     if (this_id) {
                         var this_href = jQuery(this).attr('href');

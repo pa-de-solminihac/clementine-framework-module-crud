@@ -7,6 +7,7 @@
         echo 'create';
     }
 ?>_form', function (e) {
+            var currentform = jQuery(this);
             var formaction = jQuery(this).attr('action');
             if (!formaction) {
                 formaction = document.location.href;
@@ -58,6 +59,13 @@
                             //le navigateur réécrit souvent les règles de CSS, alors on va se baser sur le début de la chaîne seulement
                             if (document.styleSheets[0].cssRules[0].cssText.substr(0, 47) != css_invalid.substr(0, 47)) {
                                 document.styleSheets[0].insertRule(css_invalid, 0);
+                            }
+                            //if the form is invalid, try to submit it again. The form won't actually submit; this will just cause the browser to display the native HTML5 error messages!
+                            try {
+                                if (!currentform[0].checkValidity()) {
+                                    currentform.find(':submit').click()
+                                }
+                            } catch (e) {
                             }
                         } else {
                             if (errdata) {

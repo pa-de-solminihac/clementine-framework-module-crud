@@ -1,4 +1,10 @@
-.clementine_crud-create-required_field,
-.clementine_crud-update-required_field {
+.clementine_crud-create-required_field:after,
+.clementine_crud-update-required_field:after {
     color: red;
+    content: "*";
 }
+
+.clementine_crud-list_table_td_actions {
+    text-align: right;
+}
+

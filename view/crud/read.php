@@ -1,37 +1,9 @@
 <?php
-$this->getBlock($data['class'] . '/errors', $data);
-if (is_array($data['values']) && (count($data['values']) == 1)) {
-    foreach ($data['values'] as $current_key => $ligne) {
-?>
-<table class="clementine_crud-read">
-<?php
-if (!(isset($data['hidden_sections']['thead']) && ($data['hidden_sections']['thead']))) {
-?>
-    <thead>
-        <tr>
-<?php
-if (!(isset($data['hidden_sections']['names']) && ($data['hidden_sections']['names']))) {
-?>
-            <th class="clementine_crud-read-title_column">Champ</th>
-<?php
+if (!$request->AJAX && empty($data['is_iframe']) && empty($data['hidden_sections']['header'])) {
+    $this->getBlock($data['class'] . '/header-' . $data['formtype'], $data, $request);
 }
-if (!(isset($data['hidden_sections']['values']) && ($data['hidden_sections']['values']))) {
-?>
-            <th class="clementine_crud-read-value_column">Valeur</th>
-<?php
-}
-?>
-        </tr>
-    </thead>
-<?php
-}
-?>
-    <tbody>
-<?php
-$this->getBlock($data['class'] . '/read_fields', array('current_key' => $current_key, 'ligne' => $ligne, 'alldata' => $data));
-?>
-    </tbody>
-</table>
-<?php
-    }
+$this->getBlock($data['class'] . '/errors', $data, $request);
+$this->getBlock($data['class'] . '/' . $data['formtype'] . '_content', $data, $request);
+if (!$request->AJAX && empty($data['is_iframe']) && empty($data['hidden_sections']['footer'])) {
+    $this->getBlock($data['class'] . '/footer-' . $data['formtype'], $data, $request);
 }

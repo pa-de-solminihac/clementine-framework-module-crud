@@ -14,38 +14,44 @@ class crudCrudController extends crudCrudController_Parent
      *
      */
     public $mapping_to_HTML = array(
-        'bit'        => 'checkbox',
-        'boolean'    => 'checkbox',
-        'enum'       => 'select',
-        'set'        => 'select',
-        'tinyint'    => 'number',
-        'int'        => 'number',
-        'smallint'   => 'number',
-        'mediumint'  => 'number',
-        'bigint'     => 'number',
-        'tinytext'   => 'textarea',
-        'text'       => 'textarea',
-        'mediumtext' => 'textarea',
-        'longtext'   => 'textarea',
-        'password'   => 'password',
-        'tel'        => 'tel',
-        'url'        => 'url',
-        'email'      => 'email',
-        'search'     => 'search',
-        'datetime'   => 'datetime',
-        'date'       => 'date',
-        'time'       => 'time',
-        'month'      => 'month',
-        'week'       => 'week',
-        'number'     => 'number',
-        'range'      => 'range',
-        'color'      => 'color',
-        'radio'      => 'radio',
-        'html'       => 'html',
-        'file'       => 'file',
-        'hidden'     => 'hidden',
-        'input'      => 'text',
-        'span'       => 'span',
+        'checkbox'     => 'checkbox',
+        'bit'          => 'checkbox',
+        'boolean'      => 'checkbox',
+        'togglebutton' => 'togglebutton',
+        'select'       => 'select',
+        'enum'         => 'select',
+        'set'          => 'select',
+        'number'       => 'number',
+        'tinyint'      => 'number',
+        'int'          => 'number',
+        'smallint'     => 'number',
+        'mediumint'    => 'number',
+        'bigint'       => 'number',
+        'textarea'     => 'textarea',
+        'tinytext'     => 'textarea',
+        'text'         => 'textarea', // le type SQL "text" => textarea, si on veut un input type="text" on peut choisir le type "input"
+        'input'        => 'text',
+        'mediumtext'   => 'textarea',
+        'longtext'     => 'textarea',
+        'password'     => 'password',
+        'tel'          => 'tel',
+        'url'          => 'url',
+        'email'        => 'email',
+        'search'       => 'search',
+        'timestamp'    => 'datetime',
+        'datetime'     => 'datetime',
+        'date'         => 'date',
+        'time'         => 'time',
+        'month'        => 'month',
+        'week'         => 'week',
+        'number'       => 'number',
+        'range'        => 'range',
+        'color'        => 'color',
+        'radio'        => 'radio',
+        'html'         => 'html',
+        'file'         => 'file',
+        'hidden'       => 'hidden',
+        'span'         => 'span',
     );
 
     /**
@@ -62,9 +68,28 @@ class crudCrudController extends crudCrudController_Parent
      * options : desactive l'autoload des valeurs des clés étrangères
      *           utile pour des raisons de performances
      */
-    public $options = array(
-        'autoload_foreign_keys_values' => false
+    private $options = array(
+        'url_parameters' => array(),
+        'autoload_foreign_keys_values' => false,
     );
+
+    public function setOption($key, $val)
+    {
+        $this->options[$key] = $val;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    public function getOption($key)
+    {
+        if (array_key_exists($key, $this->options)) {
+            return $this->options[$key];
+        }
+        return $false;
+    }
 
     /**
      * ============
@@ -75,7 +100,7 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * __construct : instancie le modèle et récupère la liste des champs dans $this->data['fields']
      */
-    public function __construct($request)
+    public function __construct($request, $params = null)
     {
         $class = strtolower(substr(get_class($this), 0, -10));
         $this->_class = $class;
@@ -83,6 +108,7 @@ class crudCrudController extends crudCrudController_Parent
         if ($this->_class == 'crud') {
             return false;
         }
+        $this->set_options($request, $params);
         $this->_crud = $this->getModel($this->_class);
         if (!isset($this->data['class'])) {
             $this->data['class'] = $this->_class;
@@ -102,7 +128,7 @@ class crudCrudController extends crudCrudController_Parent
 
     /**
      * indexAction : liste des enregistrements
-     *               peut renvoyer un export XLS si $_GET['export_xls'], 
+     *               peut renvoyer un export XLS si $_GET['export_xls'],
      *               sans noms de colonnes si $_GET['export_xls_onlydata']
      *               compatible AJAX
      *
@@ -118,8 +144,17 @@ class crudCrudController extends crudCrudController_Parent
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
         }
+        $this->setFormLinks('update');
+        $this->data['url_parameters'] = $this->getOption('url_parameters');
+        $this->data['more_classes_wrap'] = array();
+        $this->data['more_classes_table'] = array();
+        $this->data['more_classes_xlsbutton'] = array();
+        $this->data['more_classes_createbutton'] = array();
+        $this->data['button_label_create'] = 'Nouveau';
+        $this->data['button_label_xls'] = 'Exporter';
         // autoclick configurable dans le .ini
         $config = $this->getModuleConfig();
+        $this->data['date_format'] = $config['default_date_format'];
         if (!isset($this->data['autoclick'])) {
             $this->data['autoclick'] = 0;
         }
@@ -131,8 +166,8 @@ class crudCrudController extends crudCrudController_Parent
         $to_merge = array();
         $to_merge['tables'] = $this->_crud->tables;
         // fonctions pour faciliter la surcharge
-        $this->add_fields($params);
-        $this->add_fields_index($params);
+        $this->add_fields($request, $params);
+        $this->add_fields_index($request, $params);
         $to_merge['metas'] = $this->_crud->metas;
         // gestion des champs masques
         foreach ($this->_crud->metas['hidden_fields'] as $key => $val) {
@@ -142,16 +177,16 @@ class crudCrudController extends crudCrudController_Parent
         }
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
-        $this->override_fields($params);
-        $this->override_fields_index($params);
-        $this->hide_sections($params);
-        $this->hide_sections_index($params);
-        $this->hide_fields($params);
-        $this->hide_fields_index($params);
-        $this->move_fields($params);
-        $this->move_fields_index($params);
-        $this->rename_fields($params);
-        $this->rename_fields_index($params);
+        $this->override_fields($request, $params);
+        $this->override_fields_index($request, $params);
+        $this->move_fields($request, $params);
+        $this->move_fields_index($request, $params);
+        $this->rename_fields($request, $params);
+        $this->rename_fields_index($request, $params);
+        $this->hide_sections($request, $params);
+        $this->hide_sections_index($request, $params);
+        $this->hide_fields($request, $params);
+        $this->hide_fields_index($request, $params);
         // export XLS si on ajoute dans l'URL &export_xls&sEcho=1
         if (isset($params['get']['export_xls'])) {
             $this->data['export_xls'] = 1;
@@ -227,7 +262,7 @@ class crudCrudController extends crudCrudController_Parent
         }
         $cssjs = $this->getModel('cssjs');
         // charge les valeurs pour les clés étrangères
-        if ($this->options['autoload_foreign_keys_values']) {
+        if ($this->getOption('autoload_foreign_keys_values')) {
             $db = $this->getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
@@ -250,7 +285,7 @@ class crudCrudController extends crudCrudController_Parent
                 // on charge quand meme un element
                 $fake_params = $params;
                 if (!isset($fake_params['limit'])) {
-                    $fake_params['limit'] = '1'; // limit a 1 pour eviter le contenu qui apparait en flash
+                    $fake_params['limit'] = '1'; // limit a 1 pour eviter le contenu qui apparait en flash et éviter du gaspillage de ressources
                 }
                 $values = $this->_crud->getList($fake_params);
             }
@@ -273,19 +308,22 @@ class crudCrudController extends crudCrudController_Parent
         } else {
             $this->data['nb_total_values'] = count($this->data['values']);
         }
-        // par défaut, on masque les boutons dupliquer et XLS
+        // par défaut, on masque les boutons afficher, dupliquer et XLS
+        if (!isset($this->data['hidden_sections']['readbutton'])) {
+            $this->hideSection('readbutton');
+        }
         if (!isset($this->data['hidden_sections']['duplicatebutton'])) {
             $this->hideSection('duplicatebutton');
         }
         if (!isset($this->data['hidden_sections']['xlsbutton'])) {
             $this->hideSection('xlsbutton');
         }
-        $this->alter_values($params);
-        $this->alter_values_index($params);
+        $this->alter_values($request, $params);
+        $this->alter_values_index($request, $params);
         // export xls si demande
         if (isset($this->data['return_json']) && $this->data['return_json'] && isset($this->data['export_xls'])) {
             if (isset($this->data['export_xls'])) {
-                $a_exporter = unserialize($this->getBlockHtml($this->data['class'] . '/index', $this->data));
+                $a_exporter = unserialize($this->getBlockHtml($this->data['class'] . '/index', $this->data, $request));
                 if (isset($this->data['export_xls_onlydata'])) {
                     return $a_exporter;
                 }
@@ -310,6 +348,22 @@ class crudCrudController extends crudCrudController_Parent
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
         }
+        $this->setFormLinks('create');
+        $this->data['url_parameters'] = $this->getOption('url_parameters');
+        $this->data['more_classes_wrap'] = array();
+        $this->data['more_classes_form'] = array();
+        $this->data['more_classes_field_wrap'] = array();
+        $this->data['more_classes_field_key'] = array();
+        $this->data['more_classes_field_val_div'] = array();
+        $this->data['more_classes_field_val'] = array();
+        $this->data['more_classes_field_comment'] = array();
+        $this->data['more_classes_field_checkbox'] = array();
+        $this->data['more_classes_backbutton'] = array();
+        $this->data['more_classes_savebutton'] = array();
+        $this->data['more_classes_delbutton'] = array();
+        $this->data['button_label_back'] = 'Annuler';
+        $this->data['button_label_save'] = 'Enregistrer';
+        $this->data['button_label_del'] = 'Supprimer';
         $errors = array();
         // recupere les valeurs postees
         $this->get_unquoted_gpc($params);
@@ -322,21 +376,22 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
         // fonctions pour faciliter la surcharge
-        $this->add_fields($params);
-        $this->add_fields_create_or_update($params);
-        $this->override_fields($params);
-        $this->override_fields_create_or_update($params);
-        $this->hide_sections($params);
-        $this->hide_sections_create_or_update($params);
-        $this->hide_fields($params);
-        $this->hide_fields_create_or_update($params);
-        $this->move_fields($params);
-        $this->move_fields_create_or_update($params);
-        $this->rename_fields($params);
-        $this->rename_fields_create_or_update($params);
-        $this->reverse_translate_dates_gp($params);
+        $this->add_fields($request, $params);
+        $this->add_fields_create_or_update($request, $params);
+        $this->override_fields($request, $params);
+        $this->override_fields_create_or_update($request, $params);
+        $this->move_fields($request, $params);
+        $this->move_fields_create_or_update($request, $params);
+        $this->rename_fields($request, $params);
+        $this->rename_fields_create_or_update($request, $params);
+        $this->wrap_fields($request, $params);
+        $this->wrap_fields_create_or_update($request, $params);
+        $this->hide_sections($request, $params);
+        $this->hide_sections_create_or_update($request, $params);
+        $this->hide_fields($request, $params);
+        $this->hide_fields_create_or_update($request, $params);
         // charge les valeurs pour les clés étrangères
-        if ($this->options['autoload_foreign_keys_values']) {
+        if ($this->getOption('autoload_foreign_keys_values')) {
             $db = $this->getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
@@ -360,6 +415,7 @@ class crudCrudController extends crudCrudController_Parent
             }
             // nettoie les valeurs postées
             $params['post'] = $this->sanitize($params['post']);
+            $params['post'] = $this->alter_post($params['post']);
             $validate_errs = $this->validate($params['post'], $params['get']);
             $move_errs = array();
             $uploaded_files = array();
@@ -376,7 +432,7 @@ class crudCrudController extends crudCrudController_Parent
                 if (!isset($params['dont_start_transaction'])) {
                     $params['dont_start_transaction'] = false;
                 }
-                if (!$last_insert_ids = $this->_crud->createFromArray($params['post'], $params['dont_start_transaction'])) {
+                if (!$last_insert_ids = $this->_crud->create($params['post'], $params)) {
                     $errors[] = 'erreur rencontree lors de la creation';
                 }
             } else {
@@ -407,7 +463,7 @@ class crudCrudController extends crudCrudController_Parent
             // charge les donnees
             // on ne passe pas de parametres supplementaires ici, c'est volontaire
             $values = array(
-                0 => $ns->array_first($this->_crud->getFromArray($params['get']))
+                0 => $ns->array_first($this->_crud->get($params['get']))
             );
             // TODO: pour le moment on ne duplique pas les fichiers uploadés, donc on vide les champs
             // TODO: il faudrait les copier (pour que l'element dupliqué travaille sur un fichier bien à lui)
@@ -441,13 +497,13 @@ class crudCrudController extends crudCrudController_Parent
         }
         if (count($params['post'])) {
             if (!$params['dont_handle_errors']) {
-                return $this->handle_errors($errors);
+                return $this->handle_errors($errors, $params);
             } else {
                 return $errors;
             }
         }
-        $this->alter_values($params);
-        $this->alter_values_create_or_update($params);
+        $this->alter_values($request, $params);
+        $this->alter_values_create_or_update($request, $request, $params);
     }
 
     /**
@@ -464,11 +520,18 @@ class crudCrudController extends crudCrudController_Parent
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
         }
+        $this->setFormLinks('read');
+        $this->data['url_parameters'] = $this->getOption('url_parameters');
+        $this->data['more_classes_wrap'] = array();
+        $this->data['more_classes_field_wrap'] = array();
+        $this->data['more_classes_field_key'] = array();
+        $this->data['more_classes_field_val'] = array();
+        $this->data['more_classes_img'] = array();
         $errors = array();
         // recupere les valeurs postees
         $this->get_unquoted_gpc($params);
         // charge les valeurs pour les clés étrangères
-        if ($this->options['autoload_foreign_keys_values']) {
+        if ($this->getOption('autoload_foreign_keys_values')) {
             $db = $this->getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
@@ -483,7 +546,7 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // charge les donnees
-        $values = $this->_crud->getFromArray($params['get'], $params);
+        $values = $this->_crud->get($params['get'], $params);
         if (!is_array($values) || (count($values) !== 1)) {
             $errors[] = 'element non trouvé';
             $values = array();
@@ -506,18 +569,20 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // fonctions pour faciliter la surcharge
-        $this->add_fields($params);
-        $this->add_fields_read($params);
-        $this->override_fields($params);
-        $this->override_fields_read($params);
-        $this->hide_sections($params);
-        $this->hide_sections_read($params);
-        $this->hide_fields($params);
-        $this->hide_fields_read($params);
-        $this->move_fields($params);
-        $this->move_fields_read($params);
-        $this->rename_fields($params);
-        $this->rename_fields_read($params);
+        $this->add_fields($request, $params);
+        $this->add_fields_read($request, $params);
+        $this->override_fields($request, $params);
+        $this->override_fields_read($request, $params);
+        $this->move_fields($request, $params);
+        $this->move_fields_read($request, $params);
+        $this->rename_fields($request, $params);
+        $this->rename_fields_read($request, $params);
+        $this->wrap_fields($request, $params);
+        $this->wrap_fields_read($request, $params);
+        $this->hide_sections($request, $params);
+        $this->hide_sections_read($request, $params);
+        $this->hide_fields($request, $params);
+        $this->hide_fields_read($request, $params);
         // pas d'element, ou en tout cas pas accessible... on renvoie un header 404
         if (!count($this->data['values'])) {
             if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
@@ -526,9 +591,9 @@ class crudCrudController extends crudCrudController_Parent
             $this->trigger404();
         }
         // charge les valeurs pour les clés étrangères
-        if ($this->options['autoload_foreign_keys_values']) {
-            // TODO: (code obsolète supprimé)
-        }
+        //if ($this->getOption('autoload_foreign_keys_values')) {
+            //TODO: (code obsolète supprimé)
+        //}
         // affiche le fichier demande avec les memes droits que l'objet
         $ns = $this->getModel('fonctions');
         $tablefield = $ns->ifGet('string', 'file');
@@ -549,8 +614,9 @@ class crudCrudController extends crudCrudController_Parent
                 die();
             }
         }
-        $this->alter_values($params);
-        $this->alter_values_read($params);
+        $this->alter_values($request, $params);
+        $this->alter_values_read($request, $params);
+        $this->register_ui_scripts('read');
     }
 
     /**
@@ -567,6 +633,22 @@ class crudCrudController extends crudCrudController_Parent
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
         }
+        $this->setFormLinks('update');
+        $this->data['url_parameters'] = $this->getOption('url_parameters');
+        $this->data['more_classes_wrap'] = array();
+        $this->data['more_classes_form'] = array();
+        $this->data['more_classes_field_wrap'] = array();
+        $this->data['more_classes_field_key'] = array();
+        $this->data['more_classes_field_val_div'] = array();
+        $this->data['more_classes_field_val'] = array();
+        $this->data['more_classes_field_comment'] = array();
+        $this->data['more_classes_field_checkbox'] = array();
+        $this->data['more_classes_backbutton'] = array();
+        $this->data['more_classes_savebutton'] = array();
+        $this->data['more_classes_delbutton'] = array();
+        $this->data['button_label_back'] = 'Annuler';
+        $this->data['button_label_save'] = 'Enregistrer';
+        $this->data['button_label_del'] = 'Supprimer';
         $errors = array();
         // recupere les valeurs postees
         $this->get_unquoted_gpc($params);
@@ -579,21 +661,22 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
         // fonctions pour faciliter la surcharge
-        $this->add_fields($params);
-        $this->add_fields_create_or_update($params);
-        $this->override_fields($params);
-        $this->override_fields_create_or_update($params);
-        $this->hide_sections($params);
-        $this->hide_sections_create_or_update($params);
-        $this->hide_fields($params);
-        $this->hide_fields_create_or_update($params);
-        $this->move_fields($params);
-        $this->move_fields_create_or_update($params);
-        $this->rename_fields($params);
-        $this->rename_fields_create_or_update($params);
-        $this->reverse_translate_dates_gp($params);
+        $this->add_fields($request, $params);
+        $this->add_fields_create_or_update($request, $params);
+        $this->override_fields($request, $params);
+        $this->override_fields_create_or_update($request, $params);
+        $this->move_fields($request, $params);
+        $this->move_fields_create_or_update($request, $params);
+        $this->rename_fields($request, $params);
+        $this->rename_fields_create_or_update($request, $params);
+        $this->wrap_fields($request, $params);
+        $this->wrap_fields_create_or_update($request, $params);
+        $this->hide_sections($request, $params);
+        $this->hide_sections_create_or_update($request, $params);
+        $this->hide_fields($request, $params);
+        $this->hide_fields_create_or_update($request, $params);
         // charge les valeurs pour les clés étrangères
-        if ($this->options['autoload_foreign_keys_values']) {
+        if ($this->getOption('autoload_foreign_keys_values')) {
             $db = $this->getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
@@ -616,6 +699,7 @@ class crudCrudController extends crudCrudController_Parent
             }
             // nettoie les valeurs postées
             $params['post'] = $this->sanitize($params['post']);
+            $params['post'] = $this->alter_post($params['post']);
             $validate_errs = $this->validate($params['post'], $params['get']);
             $move_errs = array();
             $uploaded_files = array();
@@ -629,7 +713,7 @@ class crudCrudController extends crudCrudController_Parent
                 if (!isset($params['dont_start_transaction'])) {
                     $params['dont_start_transaction'] = false;
                 }
-                if (!$this->_crud->updateFromArray($params['post'], $params['get'], $params['dont_start_transaction'])) {
+                if (!$this->_crud->update($params['post'], $params['get'], $params)) {
                     $errors[] = 'erreur rencontree lors de la sauvegarde';
                 }
             } else {
@@ -640,7 +724,7 @@ class crudCrudController extends crudCrudController_Parent
         // charge les donnees
         $this->register_ui_scripts('update');
         // on ne passe pas de parametres supplementaires ici, c'est volontaire
-        $values = $this->_crud->getFromArray($params['get']);
+        $values = $this->_crud->get($params['get']);
         if (!is_array($values) || (count($values) !== 1)) {
             $errors[] = 'element non trouvé';
             $values = array();
@@ -663,13 +747,13 @@ class crudCrudController extends crudCrudController_Parent
         }
         if (count($params['post'])) {
             if (!$params['dont_handle_errors']) {
-                return $this->handle_errors($errors);
+                return $this->handle_errors($errors, $params);
             } else {
                 return $errors;
             }
         }
-        $this->alter_values($params);
-        $this->alter_values_create_or_update($params);
+        $this->alter_values($request, $params);
+        $this->alter_values_create_or_update($request, $params);
     }
 
     /**
@@ -740,14 +824,14 @@ class crudCrudController extends crudCrudController_Parent
             // on ne passe pas de parametres supplementaires ici, c'est volontaire
             $oldvalues = '';
             if (is_array($params['get']) && count($params['get'])) {
-                $oldvalues_list = $this->_crud->getFromArray($params['get']);
+                $oldvalues_list = $this->_crud->get($params['get']);
                 if (count($oldvalues_list)) {
                     $oldvalues = $ns->array_first($oldvalues_list);
                 }
                 // fix memory leak
                 unset($oldvalues_list);
             }
-            if (!$this->_crud->deleteFromArray($params['get'], $params['dont_start_transaction'])) {
+            if (!$this->_crud->delete($params['get'], $params)) {
                 $errors[] = 'erreur rencontree lors de la suppression';
             } else {
                 // supprime aussi les fichiers
@@ -764,11 +848,63 @@ class crudCrudController extends crudCrudController_Parent
                 }
             }
             if (!count($errors)) {
+                $href = __WWW__ . '/' . $this->_class . '/index?id=';
                 if (isset($params['url_retour'])) {
-                    $ns->redirect($params['url_retour']);
+                    $href = $params['url_retour'];
                 }
-                $ns->redirect(__WWW__ . '/' . $this->_class . '/index?id=');
+                foreach ($this->getOption('url_parameters') as $key => $val) {
+                    $href = $ns->add_param($href, $key, $val, 1);
+                }
+                $ns->redirect($href);
             }
+        }
+    }
+
+    /**
+     * ===================================================================
+     * Customizations : classes CSS utilisées pour générer les formulaires
+     * ===================================================================
+     */
+
+    /**
+     * addClass : ajoute une classe CSS sur les formulaires
+     *            utilisable depuis les hooks alter_values_*
+     *
+     * @param mixed $type : clé de tableau $this->data['more_classes_*'] correspondant à la partie du formulaire concernée
+     * @access public
+     * @return void
+     */
+    public function addClass($type, $class)
+    {
+        $this->data[$type] = array_merge($this->data[$type], array(
+            $class => $class
+        ));
+    }
+
+    /**
+     * removeClass : enlève une classe CSS sur les formulaires
+     *               utilisable depuis les hooks alter_values_*
+     *
+     * @param mixed $type : clé de tableau $this->data['more_classes_*'] correspondant à la partie du formulaire concernée
+     * @access public
+     * @return void
+     */
+    public function removeClass($type, $class)
+    {
+        unset($this->data[$type][$class]);
+    }
+
+    public function addClasses($type, $classes)
+    {
+        foreach ($classes as $class) {
+            $this->addClass($type, $class);
+        }
+    }
+
+    public function removeClasses($type, $classes)
+    {
+        foreach ($classes as $class) {
+            $this->removeClass($type, $class);
         }
     }
 
@@ -1038,11 +1174,11 @@ class crudCrudController extends crudCrudController_Parent
      *
      * @param mixed $tablefield : nom du champ virtuel sous la forme $table.$field
      * @param mixed $before_tablefield : champ $table.$field avant lequel positionner le champ
-     * @param mixed $fieldsmeta : tableau de meta informations sur le champ,
-     *                            par exemple : array('type' => 'varchar',
-                                                      'fieldvalues' => array('Foo' => 'foo',
-                                                                             'Bar' => 'bar'),
-                                                      'default_value' => 'Bar')
+     * @param mixed $fieldmeta : tableau de meta informations sur le champ,
+     *                           par exemple : array('type' => 'varchar',
+                                                     'fieldvalues' => array('Foo' => 'foo',
+                                                                            'Bar' => 'bar'),
+                                                     'default_value' => 'Bar')
      * @access public
      * @return void
      */
@@ -1155,7 +1291,7 @@ class crudCrudController extends crudCrudController_Parent
         if (!empty($this->data['metas']['title_mapping'][$tablefield])) {
             return $this->data['metas']['title_mapping'][$tablefield];
         }
-        $field = preg_replace('/.*\./', '', $tablefield);
+        $field = str_replace('_', ' ', preg_replace('/.*\./', '', $tablefield));
         return ucfirst($field);
     }
 
@@ -1224,8 +1360,12 @@ class crudCrudController extends crudCrudController_Parent
      *                 utilisable depuis le hook override_fields
      *
      * @param mixed $tablefield : $table.$field
-     * @param mixed $type : type choisi dans le tableau $this->mapping_to_HTML
-     * @param mixed $parameters : tableau de paramètres spécifiques au type choisi
+     * @param mixed $metas : tableau de metadonnees du champ, array(
+     *          'type' => type choisi dans le tableau $this->mapping_to_HTML
+     *          'size' => taille du champ
+     *          'comment' => texte d'aide
+     *      )
+     * @param mixed $parameters : tableau de paramètres spécifiques selon le type choisi
      *      Par exemple pour un type 'file' on pourra avoir :
      *      $parameters = array(
      *          'max_filesize' => 10000000,
@@ -1235,10 +1375,12 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function overrideField($tablefield, $type = null, $parameters = null)
+    public function overrideField($tablefield, $metas = null, $parameters = null)
     {
-        if (!empty($type)) {
-            $this->data['fields'][$tablefield]['type'] = $type;
+        if (!empty($metas)) {
+            foreach ($metas as $meta => $val) {
+                $this->data['fields'][$tablefield][$meta] = $val;
+            }
         }
         if (!empty($parameters)) {
             $ns = $this->getModel('fonctions');
@@ -1248,6 +1390,13 @@ class crudCrudController extends crudCrudController_Parent
             $this->data['fields'][$tablefield]['parameters'] = $ns->array_replace_recursive($this->data['fields'][$tablefield]['parameters'], $parameters);
         }
         return true;
+    }
+
+    public function overrideFields($fields_metas)
+    {
+        foreach ($fields_metas as $field => $metas) {
+            $this->overrideField($field, $metas);
+        }
     }
 
     /**
@@ -1331,8 +1480,14 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function setDefaultValue($tablefield, $default_value = '')
+    public function setDefaultValue($tablefield, $default_value = '', $params = null)
     {
+        if ($this->data['formtype'] != 'create' && empty($params['force_default_value'])) {
+            return false;
+        }
+        if (!count($this->data['values'])) {
+            return false;
+        }
         $ns = $this->getModel('fonctions');
         $first_key = $ns->array_first_key($this->data['values']);
         if (empty($this->data['values'][$first_key][$tablefield])) {
@@ -1342,12 +1497,30 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
+     * setFormLinks : définit le type de liens générés
+     *                valeurs possibles :
+     *                - "update" liens vers crud/update (default)
+     *                - "read" liens vers crud/read
+     *                - "none" pas de liens
+     *                - * pour lier vers crud/*
+     *                utilisable depuis le hook alter_values
+     *
+     * @param mixed $link_type : valeur par défaut
+     * @access public
+     * @return void
+     */
+    public function setFormLinks($formtype = "update")
+    {
+        $this->data['formtype'] = $formtype;
+    }
+
+    /**
      * renameOption : renomme une OPTION d'un champ SELECT
      *                utilisable depuis le hook override_fields
      *
      * @param mixed $tablefield : $table.$field
-     * @param mixed $from
-     * @param mixed $to
+     * @param mixed $from : current name
+     * @param mixed $to : new name. if empty, style="display: none" will be added
      * @access public
      * @return void
      */
@@ -1380,6 +1553,71 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
+     * ====================================
+     * Customizations : regroupe des champs
+     * ====================================
+     */
+
+    /**
+     * wrapFields : envelopper des groupes de champs dans des blocks
+     *
+     * @param mixed $wrapper : tableau de la forme suivante : 
+     *      array(
+     *          $from_fieldkey => $opening_block,
+     *          $to_fieldkey => $closing_block,
+     *      )
+     *      avec : 
+     *          $from_fieldkey : premier champ qu'on veut envelopper (id HTML)
+     *          $to_fieldkey : dernier champ qu'on veut envelopper (id HTML)
+     *          $opening_block : block contenant le code HTML d'ouberture dans lequel on veut envelopper
+     *          $closing_block : block contenant le code HTML de fermeture dans lequel on veut envelopper
+     * @access public
+     * @return void
+     */
+    public function wrapFields($wrapper)
+    {
+        $ns = $this->getModel('fonctions');
+        if (!is_array($wrapper)) {
+            $this->getHelper('debug')->wrapFields_wrong_params($wrapper);
+        }
+        $wrapper_keys = array_keys($wrapper);
+        $from_fieldkey = $wrapper_keys[0];
+        $opening_block = $wrapper[$from_fieldkey];
+        if (count($wrapper_keys) > 1) {
+            $to_fieldkey = $wrapper_keys[1];
+            $closing_block = $wrapper[$to_fieldkey];
+        } else {
+            $to_fieldkey = $from_fieldkey;
+            $closing_block = null;
+        }
+        // contrôles de cohérence
+        $from_tablefield = str_replace('-', '.', $from_fieldkey);
+        $to_tablefield = str_replace('-', '.', $to_fieldkey);
+        if (!isset($this->data['fields'][$from_tablefield])) {
+            $this->getHelper('debug')->unknown_field($from_fieldkey);
+        }
+        if (!isset($this->data['fields'][$to_tablefield])) {
+            $this->getHelper('debug')->unknown_field($to_fieldkey);
+        }
+        // enregistrement du wrapper
+        $wrapper = array(
+            'opening_block' => $opening_block,
+            'closing_block' => $closing_block,
+            'from_fieldkey' => $from_fieldkey,
+            'to_fieldkey' => $to_fieldkey
+        );
+        if (empty($this->data['wrappers']['open'][$from_fieldkey])) {
+            $this->data['wrappers']['open'][$from_fieldkey] = array();
+        }
+        if (empty($this->data['wrappers']['open'][$to_fieldkey])) {
+            $this->data['wrappers']['open'][$to_fieldkey] = array();
+        }
+        $this->data['wrappers']['open'][$from_fieldkey][] = $wrapper;
+        $this->data['wrappers']['close'][$to_fieldkey][] = $wrapper;
+    }
+
+
+    /**
      * ===================================================
      * Customizations : nettoyage et validation des champs
      * ===================================================
@@ -1397,8 +1635,53 @@ class crudCrudController extends crudCrudController_Parent
     public function sanitize($insecure_array)
     {
         // cette fonction est destinée à être surchargée
-        // par défaut, on appelle la fonction sanitize du modele
-        return $this->_crud->sanitizeValues($insecure_array);
+        // par défaut, on sanitize les dates puis on appelle la fonction sanitize du modele
+        $secure_array = $this->_crud->sanitizeValues($insecure_array);
+        foreach ($insecure_array as $fieldkey => $fieldval) {
+            $tablefield = str_replace('-', '.', $fieldkey);
+            if (isset($this->data['fields'][$tablefield]) && isset($this->data['fields'][$tablefield]['type'])) {
+                switch ($this->data['fields'][$tablefield]['type']) {
+                case 'date':
+                    $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
+                        "options" => array(
+                            "regexp" => "/^\d{4}-\d{2}-\d{2}$/"
+                        )
+                    )); 
+                    break;
+                case 'time':
+                    $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
+                        "options" => array(
+                            "regexp" => "/^[01][0-9]|2[0-3]:[0-5][0-9]:[0-5][0-9]$/"
+                        )
+                    )); 
+                    break;
+                case 'datetime':
+                    $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
+                        "options" => array(
+                            "regexp" => "/^\d{4}-\d{2}-\d{2} [01][0-9]|2[0-3]:[0-5][0-9]:[0-5][0-9]$/"
+                        )
+                    )); 
+                    break;
+                }
+            }
+        }
+        return $secure_array;
+    }
+
+    /**
+     * alter_post : permet d'altérer les valeurs du tableau $insecure_array posté
+     *              hook destiné à être surchargée
+     *
+     * @param mixed $insecure_array
+     * @access public
+     * @return void
+     */
+    public function alter_post($insecure_array)
+    {
+        // cette fonction est destinée à être surchargée
+        // pour générer des valeur à partir des champs custom par exemple
+        // par défaut, on ne fait rien
+        return $insecure_array;
     }
 
     /**
@@ -1413,13 +1696,22 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function validate($insecure_values, $insecure_primary_key = null)
     {
-        // par défaut aucune validation : fonction destinée à être surchargée
-        foreach ($this->data['metas']['mandatory_fields'] as $tablefield => $is_mandatory) {
-            if ($is_mandatory) {
-                $my_errors = array();
-                $fieldkey = str_replace('.', '-', $tablefield);
-                if (!isset($insecure_values[$fieldkey]) || $insecure_values[$fieldkey] == '') {
-                    $my_errors[$fieldkey] = 'le champ ' . $this->getFieldName($tablefield) . ' est obligatoire';
+        // fonction destinée à être surchargée
+        // par défaut : on vérifie juste si les champs obligatoires sont bien présents
+        $my_errors = array();
+        if (!empty($this->data['metas']['mandatory_fields'])) {
+            foreach ($this->data['metas']['mandatory_fields'] as $tablefield => $is_mandatory) {
+                if ($is_mandatory) {
+                    $fieldkey = str_replace('.', '-', $tablefield);
+                    if (!isset($insecure_values[$fieldkey]) || $insecure_values[$fieldkey] == '') {
+                        if ($this->data['fields'][$tablefield]['type'] == 'file') {
+                            if (!isset($insecure_values[$fieldkey . '-hidden']) || $insecure_values[$fieldkey . '-hidden'] == '') {
+                                $my_errors[$fieldkey] = 'le champ ' . $this->getFieldName($tablefield) . ' est obligatoire';
+                            }
+                        } else {
+                            $my_errors[$fieldkey] = 'le champ ' . $this->getFieldName($tablefield) . ' est obligatoire';
+                        }
+                    }
                 }
             }
         }
@@ -1432,13 +1724,26 @@ class crudCrudController extends crudCrudController_Parent
      * =============================
      */
 
-    public function handle_errors($errors, $url_retour = null)
+    public function handle_errors($errors, $params = null)
     {
         $request = $this->getRequest();
         $ns = $this->getModel('fonctions');
+        $values = $ns->array_first($this->data['values']);
         if (!count($errors)) {
-            if (!$url_retour) {
+            if (empty($params['url_retour'])) {
                 $url_retour = __WWW__ . '/' . $this->_class . '/index?id=';
+            } else {
+                $url_retour = $params['url_retour'];
+            }
+            foreach ($this->getOption('url_parameters') as $key => $val) {
+                $url_retour = $ns->add_param($url_retour, $key, $val, 1);
+            }
+            if (!empty($params['url_retour_parameters'])) {
+                foreach ($params['url_retour_parameters'] as $url_parameter => $tablefield) {
+                    if (!empty($values[$tablefield])) {
+                        $url_retour = $ns->add_param($url_retour, $url_parameter, $values[$tablefield], 1);
+                    }
+                }
             }
             if ($request->AJAX) {
                 echo '2';
@@ -1451,14 +1756,14 @@ class crudCrudController extends crudCrudController_Parent
             if ($request->AJAX) {
                 // valeur de retour pour AJAX
                 echo '1';
-                $this->getBlock($this->_class . '/errors', array(
-                    'errors' => $errors
-                ));
-                return $this->dontGetBlock();
-            } else {
-                $this->getBlock($this->_class . '/errors', array('errors' => $errors));
-                die();
             }
+            $this->getBlock($this->_class . '/errors', array(
+                'errors' => $errors
+            ), $request);
+            if ($request->AJAX) {
+                return $this->dontGetBlock();
+            }
+            die();
         }
     }
 
@@ -1589,7 +1894,7 @@ class crudCrudController extends crudCrudController_Parent
                 $oldvalues = '';
                 // on ne passe pas de parametres supplementaires ici, c'est volontaire
                 if ($mode != 'create' && is_array($params['get']) && count($params['get'])) {
-                    $oldvalues_list = $this->_crud->getFromArray($params['get']);
+                    $oldvalues_list = $this->_crud->get($params['get']);
                     if (count($oldvalues_list)) {
                         $oldvalues = $ns->array_first($oldvalues_list);
                     }
@@ -1692,6 +1997,7 @@ class crudCrudController extends crudCrudController_Parent
             'tables',
             'fields',
             'mapping',
+            'wrappers',
             'metas'
         );
         foreach ($default_fields as $field) {
@@ -1756,55 +2062,6 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * reverse_translate_dates_gp : recupere $_GET et $_POST dans le tableau $params si necessaire
-     *                              et traduit les formats de date 
-     *                              pour date de "d/m/Y" vers "Y-m-d"
-     *                              pour datetime de "d/m/Y H:i:s"" vers "Y-m-d H:i:s"
-     *
-     * @param mixed $params
-     * @access public
-     * @return void
-     */
-    public function reverse_translate_dates_gp(&$params)
-    {
-        $ns = $this->getModel('fonctions');
-        foreach ($params as $gpc_name => & $gpc_vals) {
-            if (!in_array($gpc_name, array(
-                'get',
-                'post'
-            ))) {
-                continue;
-            }
-            foreach ($gpc_vals as $tablefield => &$val) {
-                $tablefield_array = explode('-', $tablefield, 2);
-                if (count($tablefield_array) == 2) {
-                    $key = $tablefield_array[0] . '.' . $tablefield_array[1];
-                    if (isset($this->data['fields'][$key]) && isset($this->data['fields'][$key]['type'])) {
-                        if ($this->data['fields'][$key]['type'] == 'date') {
-                            list($date) = explode(' ', $val, 2);
-                            if ($val) {
-                                list($d, $m, $Y) = explode('/', $date, 3);
-                                $val = $Y . '-' . $m . '-' . $d;
-                            }
-                        }
-                        if ($this->data['fields'][$key]['type'] == 'datetime') {
-                            if ($val) {
-                                list($date, $time) = explode(' ', $val, 2);
-                                if ($date && $time) {
-                                    list($d, $m, $Y) = explode('/', $date, 3);
-                                    list($H, $i, $s) = explode(':', $time, 3);
-                                    $val = $Y . '-' . $m . '-' . $d . ' ' . $H . ':' . $i . ':' . $s;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $params;
-    }
-
-    /**
      * register_ui_scripts : appels cssjs->register_*
      *
      * @param mixed $params
@@ -1815,72 +2072,49 @@ class crudCrudController extends crudCrudController_Parent
     {
         $request = $this->getRequest();
         $cssjs = $this->getModel('cssjs');
-        // jQuery and jQuery UI
-        if (Clementine::$config['module_jstools']['use_google_cdn']) {
-            $cssjs->register_js('jquery', array(
-                'src' => 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'
-            ));
-        } else {
-            $cssjs->register_js('jquery', array(
-                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/jquery/jquery.min.js'
-            ));
-        }
-        $cssjs->register_js('jquery-ui', array(
-            'src' => __WWW_ROOT_JSTOOLS__ . '/skin/jquery-ui/js/jquery-ui.custom.min.js'
+        // jQuery
+        $cssjs->register_foot('jquery', array(
+            'src' => $this->getHelper('jquery')->getUrl()
         ));
         if (in_array($mode, array('create', 'update'))) {
-            // jquery.anytime
-            $cssjs->register_css('jquery.anytime', array(
-                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimec.css'
-            ));
-            $cssjs->register_js('jquery.anytime', array(
-                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimec.js'
-            ));
-            $cssjs->register_js('jquery.anytimetz', array(
-                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/anytimetz.js'
-            ));
-            $cssjs->register_js('clementine_crud-anytimejs', array(
-                'src' => __WWW_ROOT_CRUD__ . '/skin/js/anytime/clementine_crud_anytime.js'
-            ));
-            $cssjs->register_foot('clementine_crud-anytime', $this->getBlockHtml($this->_class . '/js_anytime', $this->data));
             // plupload : ajax upload
             $cssjs->register_css('plupload_clementine', array(
-                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload_clementine.css'
+                'src' => __WWW_ROOT_PLUPLOAD__ . '/skin/css/clementine-plupload.css'
             ));
-            $cssjs->register_js('plupload', array(
-                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.js'
+            $cssjs->register_foot('moxie', array(
+                'src' => __WWW_ROOT_PLUPLOAD__ . '/skin/js/moxie.js'
             ));
-            $cssjs->register_js('plupload.i18n', array(
-                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/i18n/' . $request->LANG . '.js'
+            $cssjs->register_foot('plupload', array(
+                'src' => __WWW_ROOT_PLUPLOAD__ . '/skin/js/plupload.dev.js'
             ));
-            $cssjs->register_js('plupload.runtime.html5', array(
-                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.html5.js'
+            $cssjs->register_foot('plupload.i18n', array(
+                'src' => __WWW_ROOT_PLUPLOAD__ . '/skin/js/i18n/' . $request->LANG . '.js'
             ));
-            $cssjs->register_js('plupload.runtime.flash', array(
-                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.flash.js'
-            ));
-            $cssjs->register_js('plupload.runtime.html4', array(
-                'src' => __WWW_ROOT_JSTOOLS__ . '/skin/plupload/plupload.html4.js'
-            ));
-            $cssjs->register_foot('clementine_crud-plupload', $this->getBlockHtml($this->_class . '/js_plupload', $this->data));
+            $cssjs->register_foot('clementine_crud-plupload', $this->getBlockHtml($this->_class . '/js_plupload', $this->data, $request));
             //validation AJAX
-            $cssjs->register_foot('valid_' . $mode . '_ajax', $this->getBlockHtml($this->_class . '/valid_' . $mode . '_ajax', $this->data));
+            $cssjs->register_foot('valid_' . $mode . '_ajax', $this->getBlockHtml($this->_class . '/valid_' . $mode . '_ajax', $this->data, $request));
+            $cssjs->register_foot($this->_class . '_datepicker', $this->getBlockHtml($this->_class . '/js_datepicker', $this->data));
+        }
+        if (in_array($mode, array('index', 'create', 'update'))) {
             $cssjs->register_css('valid_' . $mode . '_css', array(
                 'src' => __WWW_ROOT_CRUD__ . '/skin/css/clementine_crud.css'
             ));
+            // table autoclick effects
+            $cssjs->register_foot('clementine_crud-list_table_autoclick', $this->getBlockHtml($this->_class . '/js_list_table_autoclick', $this->data, $request));
+            // dataTables : sortable tables
+            $cssjs->register_css('clementine-jquery.dataTables', array(
+                'src' => __WWW_ROOT_JQUERYDATATABLES__ . '/skin/css/clementine-dataTables.css'
+            ));
+            $cssjs->register_css('jquery.dataTables', array(
+                'src' => __WWW_ROOT_JQUERYDATATABLES__ . '/skin/css/jquery.dataTables.css'
+            ));
+            $cssjs->register_foot('jquery.dataTables', array(
+                'src' => __WWW_ROOT_JQUERYDATATABLES__ . '/skin/js/jquery.dataTables.min.js'
+            ));
+            $cssjs->register_foot('clementine_crud-datatables', $this->getBlockHtml($this->_class . '/js_datatables', $this->data, $request));
+            // alert on delbutton
+            $cssjs->register_foot('clementine_crud-delbutton_confirm', $this->getBlockHtml($this->_class . '/js_delbutton_confirm', $this->data, $request));
         }
-        // table hover effects
-        $cssjs->register_foot('clementine_crud-list_table_hover', $this->getBlockHtml($this->_class . '/js_list_table_hover', $this->data));
-        // dataTables : sortable tables
-        $cssjs->register_css('jquery.dataTables', array(
-            'src' => __WWW_ROOT_JSTOOLS__ . '/skin/js/jquery.dataTables/dataTables.css'
-        ));
-        $cssjs->register_js('jquery.dataTables', array(
-            'src' => __WWW_ROOT_JSTOOLS__ . '/skin/js/jquery.dataTables/jquery.dataTables.min.js'
-        ));
-        $cssjs->register_foot('clementine_crud-datatables', $this->getBlockHtml($this->_class . '/js_datatables', $this->data));
-        // alert on delbutton
-        $cssjs->register_foot('clementine_crud-delbutton_confirm', $this->getBlockHtml($this->_class . '/js_delbutton_confirm', $this->data));
     }
 
     /**
@@ -1940,13 +2174,17 @@ class crudCrudController extends crudCrudController_Parent
      * =====================================
      */
 
+    public function set_options($request = null, $params = null)
+    {
+    }
+
     /**
      * override_fields : surcharge les types de champs
      *
      * @access public
      * @return void
      */
-    public function override_fields($params = null)
+    public function override_fields($request, $params = null)
     {
         /*$this->overrideField('table.field', 'file', array(*/
             /*'max_filesize' => 10000000,*/
@@ -1955,15 +2193,15 @@ class crudCrudController extends crudCrudController_Parent
         /*));*/
     }
 
-    public function override_fields_index($params = null)
+    public function override_fields_index($request, $params = null)
     {
     }
 
-    public function override_fields_create_or_update($params = null)
+    public function override_fields_create_or_update($request, $params = null)
     {
     }
 
-    public function override_fields_read($params = null)
+    public function override_fields_read($request, $params = null)
     {
     }
 
@@ -1976,19 +2214,19 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function alter_values($params = null)
+    public function alter_values($request, $params = null)
     {
     }
 
-    public function alter_values_index($params = null)
+    public function alter_values_index($request, $params = null)
     {
     }
 
-    public function alter_values_create_or_update($params = null)
+    public function alter_values_create_or_update($request, $params = null)
     {
     }
 
-    public function alter_values_read($params = null)
+    public function alter_values_read($request, $params = null)
     {
     }
 
@@ -2001,19 +2239,43 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function rename_fields($params = null)
+    public function rename_fields($request, $params = null)
     {
     }
 
-    public function rename_fields_index($params = null)
+    public function rename_fields_index($request, $params = null)
     {
     }
 
-    public function rename_fields_create_or_update($params = null)
+    public function rename_fields_create_or_update($request, $params = null)
     {
     }
 
-    public function rename_fields_read($params = null)
+    public function rename_fields_read($request, $params = null)
+    {
+    }
+
+    /**
+     * wrap_fields : fonction appellée par index, creation, read, et update
+     *               pour envelopper des groupes de champs dans des balises html
+     *
+     * @param mixed $params
+     * @access public
+     * @return void
+     */
+    public function wrap_fields($request, $params = null)
+    {
+    }
+
+    public function wrap_fields_index($request, $params = null)
+    {
+    }
+
+    public function wrap_fields_create_or_update($request, $params = null)
+    {
+    }
+
+    public function wrap_fields_read($request, $params = null)
     {
     }
 
@@ -2025,19 +2287,19 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function hide_fields($params = null)
+    public function hide_fields($request, $params = null)
     {
     }
 
-    public function hide_fields_index($params = null)
+    public function hide_fields_index($request, $params = null)
     {
     }
 
-    public function hide_fields_create_or_update($params = null)
+    public function hide_fields_create_or_update($request, $params = null)
     {
     }
 
-    public function hide_fields_read($params = null)
+    public function hide_fields_read($request, $params = null)
     {
     }
 
@@ -2049,19 +2311,19 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function add_fields($params = null)
+    public function add_fields($request, $params = null)
     {
     }
 
-    public function add_fields_index($params = null)
+    public function add_fields_index($request, $params = null)
     {
     }
 
-    public function add_fields_create_or_update($params = null)
+    public function add_fields_create_or_update($request, $params = null)
     {
     }
 
-    public function add_fields_read($params = null)
+    public function add_fields_read($request, $params = null)
     {
     }
 
@@ -2073,19 +2335,19 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function move_fields($params = null)
+    public function move_fields($request, $params = null)
     {
     }
 
-    public function move_fields_index($params = null)
+    public function move_fields_index($request, $params = null)
     {
     }
 
-    public function move_fields_create_or_update($params = null)
+    public function move_fields_create_or_update($request, $params = null)
     {
     }
 
-    public function move_fields_read($params = null)
+    public function move_fields_read($request, $params = null)
     {
     }
 
@@ -2097,19 +2359,19 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function hide_sections($params = null)
+    public function hide_sections($request, $params = null)
     {
     }
 
-    public function hide_sections_index($params = null)
+    public function hide_sections_index($request, $params = null)
     {
     }
 
-    public function hide_sections_create_or_update($params = null)
+    public function hide_sections_create_or_update($request, $params = null)
     {
     }
 
-    public function hide_sections_read($params = null)
+    public function hide_sections_read($request, $params = null)
     {
     }
 
