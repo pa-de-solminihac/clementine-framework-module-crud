@@ -26,11 +26,12 @@ $sections = array(
 if (empty($data['crud-sections'])) {
     $data['crud-sections'] = $sections;
 } else {
-    $data['crud-sections'] = array_merge($data['crud-sections'], $sections);
+    // merge overrides and default sections
+    // special values :
+    //     'getParent' : import section from parent, usefull if you want to fix a menu item's position
+    //     null : unset menu item
+    $data['crud-sections'] = $ns->array_override($sections, $data['crud-sections']);
 }
-
-//Clementine::dump($data['alldata']['hidden_sections']);
-//die();
 // complete urls and generate html code
 foreach ($data['crud-sections'] as $section_key => $section_metas) {
     if (empty($data['alldata']['hidden_sections'][$section_key])) {
