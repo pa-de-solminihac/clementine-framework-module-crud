@@ -109,7 +109,7 @@ class crudCrudController extends crudCrudController_Parent
             return false;
         }
         $this->set_options($request, $params);
-        $this->_crud = $this->getModel($this->_class);
+        $this->_crud = $this->getModel($this->_class, $params);
         if (!isset($this->data['class'])) {
             $this->data['class'] = $this->_class;
         }
