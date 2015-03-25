@@ -497,7 +497,7 @@ class crudCrudController extends crudCrudController_Parent
         }
         if (count($params['post'])) {
             if (!$params['dont_handle_errors']) {
-                return $this->handle_errors($errors, $params);
+                return $this->handle_errors($request, $errors, $params);
             } else {
                 return $errors;
             }
@@ -747,7 +747,7 @@ class crudCrudController extends crudCrudController_Parent
         }
         if (count($params['post'])) {
             if (!$params['dont_handle_errors']) {
-                return $this->handle_errors($errors, $params);
+                return $this->handle_errors($request, $errors, $params);
             } else {
                 return $errors;
             }
@@ -1724,7 +1724,7 @@ class crudCrudController extends crudCrudController_Parent
      * =============================
      */
 
-    public function handle_errors($errors, $params = null)
+    public function handle_errors($request, $errors, $params = null)
     {
         $request = $this->getRequest();
         $ns = $this->getModel('fonctions');
@@ -1748,7 +1748,8 @@ class crudCrudController extends crudCrudController_Parent
             if ($request->AJAX) {
                 echo '2';
                 echo $url_retour;
-                return $this->dontGetBlock();
+                // pas un dontGetBlock ici car on ne veut pas que du code s'exécute après
+                die();
             } else {
                 $ns->redirect($url_retour);
             }
@@ -1760,9 +1761,6 @@ class crudCrudController extends crudCrudController_Parent
             $this->getBlock($this->_class . '/errors', array(
                 'errors' => $errors
             ), $request);
-            if ($request->AJAX) {
-                return $this->dontGetBlock();
-            }
             die();
         }
     }
