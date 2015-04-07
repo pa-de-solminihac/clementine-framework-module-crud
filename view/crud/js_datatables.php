@@ -35,7 +35,7 @@ if (Clementine::$config['module_jquerydatatables']['nb_res_datatables']) {
                             }
                             myDataTable.fnProcessingIndicator(false);
                         }
-                    }); 
+                    });
                 },
                 "sAjaxSource": "<?php echo $request->EQUIV[$request->LANG]; ?>",
                 "sServerMethod": "GET",
@@ -57,6 +57,9 @@ if (Clementine::$config['module_jquerydatatables']['nb_res_datatables']) {
                     }
                     jQuery('td', nRow).each(function(cellIndex) {
                         jQuery(this).addClass(noms_colonnes[cellIndex]);
+                        if (noms_colonnes[cellIndex] != 'clementine_crud-list_table_td_actions') {
+                            jQuery(this).attr('title', jQuery(this).text());
+                        }
                     });
                     return nRow;
                 },
