@@ -81,6 +81,7 @@ class siteAnnonceModel extends siteAnnonceModel_Parent /* extends CrudModel */
         $this->tables = array(
             'annonce' => ''
         );
+    }
 }
 ```
 
