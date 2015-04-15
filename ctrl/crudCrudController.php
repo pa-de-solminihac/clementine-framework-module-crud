@@ -1445,7 +1445,7 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function unsetFieldValues($table, $field, $values)
+    public function unsetFieldValues($tablefield, $values)
     {
         if (isset($this->data['fields'][$tablefield])) {
             unset($this->data['fields'][$tablefield]['fieldvalues']);
