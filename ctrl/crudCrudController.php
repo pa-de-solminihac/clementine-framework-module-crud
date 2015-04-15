@@ -1439,8 +1439,7 @@ class crudCrudController extends crudCrudController_Parent
      *                    dans une vue, ce qui fait du champ un SELECT
      *                    utilisable depuis le hook override_fields
      *
-     * @param mixed $table
-     * @param mixed $field
+     * @param mixed $tablefield
      * @param mixed $values
      * @access public
      * @return void
