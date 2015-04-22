@@ -434,6 +434,16 @@ class crudCrudController extends crudCrudController_Parent
                 }
                 if (!$last_insert_ids = $this->_crud->create($params['post'], $params)) {
                     $errors[] = 'erreur rencontree lors de la creation';
+                } else {
+                    if (!isset($params['url_retour'])) {
+                        $query_string = array();
+                        foreach ($last_insert_ids as $table => $champs) {
+                            foreach ($champs as $champ => $val) {
+                                $query_string[$table . '-' . $champ] = $val;
+                            }
+                        }
+                        $params['url_retour'] = __WWW__ . '/' . $this->_class . '/index?' . http_build_query($query_string);
+                    }
                 }
             } else {
                 $errors = array_merge($errors, $validate_errs);
@@ -719,6 +729,9 @@ class crudCrudController extends crudCrudController_Parent
             } else {
                 // TODO : suppression des fichiers uploades (dans un cron ?)
                 $errors = array_merge($errors, $validate_errs, $move_errs);
+            }
+            if (!isset($params['url_retour'])) {
+                $params['url_retour'] = __WWW__ . '/' . $this->_class . '/index?' . http_build_query($params['get']);
             }
         }
         // charge les donnees
