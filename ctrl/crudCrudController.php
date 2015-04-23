@@ -154,7 +154,9 @@ class crudCrudController extends crudCrudController_Parent
         $this->data['button_label_xls'] = 'Exporter';
         // autoclick configurable dans le .ini
         $config = $this->getModuleConfig();
+        $this->data['datetime_format'] = $config['default_datetime_format'];
         $this->data['date_format'] = $config['default_date_format'];
+        $this->data['time_format'] = $config['default_time_format'];
         if (!isset($this->data['autoclick'])) {
             $this->data['autoclick'] = 0;
         }
