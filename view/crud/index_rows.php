@@ -75,7 +75,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             case 'time':
                             case 'datetime':
                                 if (!empty($data['ligne'][$tablefield]) && false === strpos($data['ligne'][$tablefield], '0000-00-00')) {
-                                    $out.= strftime($data['alldata']['date_format'], strtotime($data['ligne'][$tablefield]));
+                                    $out.= strftime($data['alldata'][$mapping . '_format'], strtotime($data['ligne'][$tablefield]));
                                 }
                                 break;
 
