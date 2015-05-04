@@ -63,7 +63,10 @@
                             //if the form is invalid, try to submit it again. The form won't actually submit; this will just cause the browser to display the native HTML5 error messages!
                             try {
                                 if (!currentform[0].checkValidity()) {
-                                    currentform.find(':submit').click()
+                                    // setTimeout necessaire pour Chrome
+                                    setTimeout(function() {
+                                        currentform.find(':submit').click()
+                                    }, 100);
                                 }
                             } catch (e) {
                             }

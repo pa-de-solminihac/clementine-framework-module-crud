@@ -1665,14 +1665,14 @@ class crudCrudController extends crudCrudController_Parent
                 case 'time':
                     $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
                         "options" => array(
-                            "regexp" => "/^[01][0-9]|2[0-3]:[0-5][0-9]:[0-5][0-9]$/"
+                            "regexp" => "/^([01][0-9]|(2[0-3])):[0-5][0-9]$/"
                         )
                     )); 
                     break;
                 case 'datetime':
                     $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
                         "options" => array(
-                            "regexp" => "/^\d{4}-\d{2}-\d{2} [01][0-9]|2[0-3]:[0-5][0-9]:[0-5][0-9]$/"
+                            "regexp" => "/^\d{4}-\d{2}-\d{2} ([01][0-9]|(2[0-3])):[0-5][0-9]$/"
                         )
                     )); 
                     break;
