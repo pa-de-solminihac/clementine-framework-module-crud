@@ -1438,6 +1438,9 @@ class crudCrudController extends crudCrudController_Parent
         }
     }
 
+    /**
+     * overrideUrls : force l'url de plusieurs boutons. La clé représente le nom du bouton et la valeur associé est son url
+     */
     public function overrideUrls($button_urls)
     {
         foreach ($button_urls as $button => $url) {
