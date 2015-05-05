@@ -10,7 +10,7 @@ function crud_js_datepicker_update_shadow(id, value) {
     return true;
 }
 jQuery(document).ready(function() {
-    jQuery('.clementine_crud-create_type-date, .clementine_crud-update_type-date, .clementine_crud-create_type-time, .clementine_crud-update_type-time, .clementine_crud-create_type-datetime, .clementine_crud-update_type-datetime').on(
+    jQuery('.clementine_crud-create_type-date, .clementine_crud-update_type-date, .clementine_crud-create_type-time, .clementine_crud-update_type-time, .clementine_crud-create_type-datetime, .clementine_crud-update_type-datetime, .clementine_crud-update_type-week, .clementine_crud-update_type-month').on(
         'change.<?php echo $data['class']; ?>_datepicker, focus.<?php echo $data['class']; ?>_datepicker, blur.<?php echo $data['class']; ?>_datepicker',
         function(e) {
             var el = jQuery(this);

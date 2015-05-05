@@ -329,13 +329,36 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                         case 'month':
                         case 'week':
                             // shadowed element
-
+                            $datetime_value = str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $htmlval);
+                            $datetime_formated = '';
+                            // force date/time format
+                            if (strlen($datetime_value)) {
+                                $datetime_timestamp = strtotime($datetime_value);
+                                switch ($mapping) {
+                                case 'date':
+                                    $datetime_format = 'Y-m-d';
+                                    break;
+                                case 'time':
+                                    $datetime_format = 'H:i';
+                                    break;
+                                case 'datetime':
+                                    $datetime_format = 'Y-m-d H:i';
+                                    break;
+                                case 'month':
+                                    $datetime_format = 'Y-m';
+                                    break;
+                                case 'week':
+                                    $datetime_format = 'o-\WW';
+                                    break;
+                                }
+                                $datetime_formated = date($datetime_format, $datetime_timestamp);
+                            }
 ?>
                 <input
                     type="hidden"
                     id="<?php echo $field_class; ?>-hidden"
                     name="<?php echo $field_class; ?>"
-                    value="<?php echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $htmlval); ?>" />
+                    value="<?php echo $datetime_formated; ?>" />
 <?php
                             echo $label_open;
                             echo $label_close;
@@ -347,7 +370,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                         type="<?php echo $mapping; ?>"
                         id="<?php echo $field_class; ?>"
                         class="<?php echo $valueclasses; ?> <?php echo $valueclasses_more; ?>"
-                        value="<?php echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $htmlval); ?>"
+                        value="<?php echo $datetime_formated; ?>"
                         <?php
                             if (!empty($fieldmeta['readonly'])) {
                                 echo " readonly ";
