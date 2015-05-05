@@ -189,6 +189,8 @@ class crudCrudController extends crudCrudController_Parent
         $this->hide_sections_index($request, $params);
         $this->hide_fields($request, $params);
         $this->hide_fields_index($request, $params);
+        $this->override_url($request, $params);
+        $this->override_url_index($request, $params);
         // export XLS si on ajoute dans l'URL &export_xls&sEcho=1
         if (isset($params['get']['export_xls'])) {
             $this->data['export_xls'] = 1;
@@ -392,6 +394,8 @@ class crudCrudController extends crudCrudController_Parent
         $this->hide_sections_create_or_update($request, $params);
         $this->hide_fields($request, $params);
         $this->hide_fields_create_or_update($request, $params);
+        $this->override_url($request, $params);
+        $this->override_url_create_or_update($request, $params);
         // charge les valeurs pour les clés étrangères
         if ($this->getOption('autoload_foreign_keys_values')) {
             $db = $this->getModel('db');
@@ -595,6 +599,8 @@ class crudCrudController extends crudCrudController_Parent
         $this->hide_sections_read($request, $params);
         $this->hide_fields($request, $params);
         $this->hide_fields_read($request, $params);
+        $this->override_url($request, $params);
+        $this->override_url_read($request, $params);
         // pas d'element, ou en tout cas pas accessible... on renvoie un header 404
         if (!count($this->data['values'])) {
             if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
@@ -687,6 +693,8 @@ class crudCrudController extends crudCrudController_Parent
         $this->hide_sections_create_or_update($request, $params);
         $this->hide_fields($request, $params);
         $this->hide_fields_create_or_update($request, $params);
+        $this->override_url($request, $params);
+        $this->override_url_create_or_update($request, $params);
         // charge les valeurs pour les clés étrangères
         if ($this->getOption('autoload_foreign_keys_values')) {
             $db = $this->getModel('db');
@@ -1191,9 +1199,9 @@ class crudCrudController extends crudCrudController_Parent
      * @param mixed $before_tablefield : champ $table.$field avant lequel positionner le champ
      * @param mixed $fieldmeta : tableau de meta informations sur le champ,
      *                           par exemple : array('type' => 'varchar',
-                                                     'fieldvalues' => array('Foo' => 'foo',
-                                                                            'Bar' => 'bar'),
-                                                     'default_value' => 'Bar')
+     *                                                'fieldvalues' => array('Foo' => 'foo',
+     *                                                                       'Bar' => 'bar'),
+     *                                                'default_value' => 'Bar')
      * @access public
      * @return void
      */
@@ -1413,6 +1421,30 @@ class crudCrudController extends crudCrudController_Parent
             $this->overrideField($field, $metas);
         }
     }
+
+    /**
+     *  overrideUrl : force l'url d'un boutton utilisable depuis le hook override_urls
+     *  
+     *  @param $button peut valoir back, del 
+     *  @param $url ce que l'on veut
+     *  @access public
+     *  @return void
+     *
+     */
+    public function overrideUrl($button, $url = null)
+    {
+        if (!empty($url)) {
+            $this->data['button_url_' . $button] = $url;
+        }
+    }
+
+    public function overrideUrls($button_urls)
+    {
+        foreach ($button_urls as $button => $url) {
+            $this->overrideUrl($button, $url);
+        }
+    }
+
 
     /**
      * getFieldValues : raccourci pour récupérer les valeurs possibles d'un champ SELECT par exemple
@@ -2216,6 +2248,34 @@ class crudCrudController extends crudCrudController_Parent
     public function override_fields_read($request, $params = null)
     {
     }
+
+
+
+    /**
+     * override_url : fonctions appelee par indexAction, updateAction et readAction
+     *                pour modifier l'url des bouttons back, validate, delete
+     *
+     * @param mixed $params
+     * @access public
+     * @return void
+     */
+    public function override_url($request, $params = null)
+    {
+    }
+
+    public function override_url_index($request, $params = null)
+    {
+    }
+
+    public function override_url_create_or_update($request, $params = null)
+    {
+    }
+
+    public function override_url_read($request, $params = null)
+    {
+    }
+
+
 
     /**
      * alter_values : fonctions appelee par indexAction, updateAction et readAction
