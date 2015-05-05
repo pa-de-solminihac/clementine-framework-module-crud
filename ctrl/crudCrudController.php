@@ -1199,9 +1199,9 @@ class crudCrudController extends crudCrudController_Parent
      * @param mixed $before_tablefield : champ $table.$field avant lequel positionner le champ
      * @param mixed $fieldmeta : tableau de meta informations sur le champ,
      *                           par exemple : array('type' => 'varchar',
-     *                                                'fieldvalues' => array('Foo' => 'foo',
-     *                                                                       'Bar' => 'bar'),
-     *                                                'default_value' => 'Bar')
+     *                                               'fieldvalues' => array('Foo' => 'foo',
+     *                                                                      'Bar' => 'bar'),
+     *                                               'default_value' => 'Bar')
      * @access public
      * @return void
      */
