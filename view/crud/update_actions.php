@@ -8,6 +8,9 @@ if (!empty($data['alldata']['formtype'])) {
 if (!(isset($data['alldata']['hidden_sections']['backbutton']) && ($data['alldata']['hidden_sections']['backbutton']))) {
     $button_label = $data['alldata']["button_label_back"];
     $href = __WWW__ . '/' . $data['alldata']['class'];
+    if(isset($data['alldata']['button_url_back']) && !empty($data['alldata']['button_url_back'])) {
+        $href = $data['alldata']['button_url_back'];
+    }
     foreach ($data['alldata']['url_parameters'] as $key => $val) {
         $href = $ns->add_param($href, $key, $val, 1);
     }
@@ -36,6 +39,9 @@ if ($formtype == 'update') {
     $button_label = $data['alldata']["button_label_del"];
     if (!(isset($data['alldata']['hidden_sections']['delbutton']) && ($data['alldata']['hidden_sections']['delbutton']))) {
         $href = __WWW__ . '/' . $data['alldata']['class'] . '/delete?' . $ns->htmlentities($data['current_key']);
+        if(isset($data['alldata']['button_url_del']) && !empty($data['alldata']['button_url_del'])) {
+            $href = $data['alldata']['button_url_del'];
+        }
         foreach ($data['alldata']['url_parameters'] as $key => $val) {
             $href = $ns->add_param($href, $key, $val, 1);
         }
