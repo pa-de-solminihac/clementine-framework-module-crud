@@ -1423,15 +1423,15 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     *  overrideUrl : force l'url d'un boutton utilisable depuis le hook override_urls
-     *  
-     *  @param $button peut valoir back, del 
+     *  overrideUrlButton : force l'url d'un boutton utilisable depuis le hook override_urls
+     *
+     *  @param $button peut valoir back, del, updatebutton, readbutton, duplicatebutton, delbutton
      *  @param $url ce que l'on veut
      *  @access public
      *  @return void
      *
      */
-    public function overrideUrl($button, $url = null)
+    public function overrideUrlButton($button, $url = null)
     {
         if (!empty($url)) {
             $this->data['button_url_' . $button] = $url;
@@ -1439,19 +1439,33 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * overrideUrls : force l'url de plusieurs boutons. La clé représente le nom du bouton et la valeur associé est son url
-     *              
+     * overrideUrlsButton : force l'url de plusieurs boutons. La clé représente le nom du bouton et la valeur associé est son url
+     *
      *  @param $button_urls est un array de la forme array('nomBouton' => 'url')
-     *  @access public  
+     *  @access public
      *  @return void
      */
-    public function overrideUrls($button_urls)
+    public function overrideUrlsButtons($button_urls)
     {
         foreach ($button_urls as $button => $url) {
             $this->overrideUrl($button, $url);
         }
     }
 
+    /**
+     * overrideUrlRow : force l'url des liens présent dans les lignes de l'index du crud
+     *
+     * @param $url est l'url desiré
+     * @access public
+     * @return void
+     *
+     */
+    public function overrideUrlRow($url)
+    {
+        if (!empty($url)) {
+            $this->data['row_url'] = $url;
+        }
+    }
 
     /**
      * getFieldValues : raccourci pour récupérer les valeurs possibles d'un champ SELECT par exemple
@@ -1614,12 +1628,12 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * wrapFields : envelopper des groupes de champs dans des blocks
      *
-     * @param mixed $wrapper : tableau de la forme suivante : 
+     * @param mixed $wrapper : tableau de la forme suivante :
      *      array(
      *          $from_fieldkey => $opening_block,
      *          $to_fieldkey => $closing_block,
      *      )
-     *      avec : 
+     *      avec :
      *          $from_fieldkey : premier champ qu'on veut envelopper (id HTML)
      *          $to_fieldkey : dernier champ qu'on veut envelopper (id HTML)
      *          $opening_block : block contenant le code HTML d'ouberture dans lequel on veut envelopper
@@ -1669,7 +1683,6 @@ class crudCrudController extends crudCrudController_Parent
         $this->data['wrappers']['close'][$to_fieldkey][] = $wrapper;
     }
 
-
     /**
      * ===================================================
      * Customizations : nettoyage et validation des champs
@@ -1699,21 +1712,21 @@ class crudCrudController extends crudCrudController_Parent
                         "options" => array(
                             "regexp" => "/^\d{4}-\d{2}-\d{2}$/"
                         )
-                    )); 
+                    ));
                     break;
                 case 'time':
                     $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
                         "options" => array(
                             "regexp" => "/^([01][0-9]|(2[0-3])):[0-5][0-9]$/"
                         )
-                    )); 
+                    ));
                     break;
                 case 'datetime':
                     $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
                         "options" => array(
                             "regexp" => "/^\d{4}-\d{2}-\d{2} ([01][0-9]|(2[0-3])):[0-5][0-9]$/"
                         )
-                    )); 
+                    ));
                     break;
                 }
             }
@@ -2256,8 +2269,6 @@ class crudCrudController extends crudCrudController_Parent
     {
     }
 
-
-
     /**
      * override_url : fonctions appelee par indexAction, updateAction et readAction
      *                pour modifier l'url des bouttons back, validate, delete
@@ -2281,8 +2292,6 @@ class crudCrudController extends crudCrudController_Parent
     public function override_url_read($request, $params = null)
     {
     }
-
-
 
     /**
      * alter_values : fonctions appelee par indexAction, updateAction et readAction
