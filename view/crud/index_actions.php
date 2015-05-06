@@ -1,24 +1,35 @@
 <?php
 $ns = $this->getModel('fonctions');
 $current_key = $ns->htmlentities($data['current_key']);
+$arrayUrl = array('updatebutton' => __WWW__ . '/' . $data['alldata']['class'] . '/update?' . $current_key,
+                  'readbutton' => __WWW__ . '/' . $data['alldata']['class'] . '/read?' . $current_key,
+                  'duplicatebutton' => __WWW__ . '/' . $data['alldata']['class'] . '/create?duplicate=1&' . $current_key,
+                  'delbutton' => __WWW__ . '/' . $data['alldata']['class'] . '/delete?' . $current_key);
+
+foreach ($arrayUrl as $key => &$value) {
+    if (isset($data['alldata']['button_url_' . $key])) {
+        $value = $data['alldata']['button_url_' . $key] . $current_key;
+    }
+}
+
 $sections = array(
     'updatebutton' => array(
-        'url' => __WWW__ . '/' . $data['alldata']['class'] . '/update?' . $current_key,
+        'url' => $arrayUrl['updatebutton'],
         'icon' => 'glyphicon glyphicon-edit',
         'label' => 'Modifier',
     ),
     'readbutton' => array(
-        'url' => __WWW__ . '/' . $data['alldata']['class'] . '/read?' . $current_key,
+        'url' => $arrayUrl['readbutton'],
         'icon' => 'glyphicon glyphicon-file',
         'label' => 'Afficher',
     ),
     'duplicatebutton' => array(
-        'url' => __WWW__ . '/' . $data['alldata']['class'] . '/create?duplicate=1&' . $current_key,
+        'url' => $arrayUrl['duplicatebutton'],
         'icon' => 'glyphicon glyphicon-duplicate',
         'label' => 'Dupliquer',
     ),
     'delbutton' => array(
-        'url' => __WWW__ . '/' . $data['alldata']['class'] . '/delete?' . $current_key,
+        'url' => $arrayUrl['delbutton'],
         'icon' => 'glyphicon glyphicon-trash',
         'label' => 'Supprimer',
     ),

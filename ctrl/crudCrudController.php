@@ -1423,15 +1423,15 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     *  overrideUrl : force l'url d'un boutton utilisable depuis le hook override_urls
+     *  overrideUrlButton : force l'url d'un boutton utilisable depuis le hook override_urls
      *  
-     *  @param $button peut valoir back, del 
+     *  @param $button peut valoir back, del, updatebutton, readbutton, duplicatebutton, delbutton 
      *  @param $url ce que l'on veut
      *  @access public
      *  @return void
      *
      */
-    public function overrideUrl($button, $url = null)
+    public function overrideUrlButton($button, $url = null)
     {
         if (!empty($url)) {
             $this->data['button_url_' . $button] = $url;
@@ -1439,16 +1439,31 @@ class crudCrudController extends crudCrudController_Parent
     }
 
     /**
-     * overrideUrls : force l'url de plusieurs boutons. La clé représente le nom du bouton et la valeur associé est son url
+     * overrideUrlsButton : force l'url de plusieurs boutons. La clé représente le nom du bouton et la valeur associé est son url
      *              
      *  @param $button_urls est un array de la forme array('nomBouton' => 'url')
      *  @access public  
      *  @return void
      */
-    public function overrideUrls($button_urls)
+    public function overrideUrlsButtons($button_urls)
     {
         foreach ($button_urls as $button => $url) {
             $this->overrideUrl($button, $url);
+        }
+    }
+
+    /**
+     * overrideUrlRow : force l'url des liens présent dans les lignes de l'index du crud
+     *
+     * @param $url est l'url desiré
+     * @access public
+     * @return void
+     *
+     */
+    public function overrideUrlRow($url)
+    {
+        if (!empty($url)) {
+            $this->data['row_url'] = $url;
         }
     }
 
