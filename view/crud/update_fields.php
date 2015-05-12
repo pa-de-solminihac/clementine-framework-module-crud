@@ -494,8 +494,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             selected="selected"
 <?php
                                         }
-                                        if(is_array($fieldval))
-                                        { 
+                                        if(is_array($fieldval)) { 
                                             if (!strlen($fieldval['text'])) {
 ?>
                             style="display: none; "
@@ -508,15 +507,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
 <?php
                                             }
                                         }
-                                        if(is_array($fieldval))
-                                        {
-                                            foreach($fieldval as $fkey => $fv )
-                                            {
-                                                if( $fkey != 'text' )
-                                                {
+                                        if(is_array($fieldval)) {
+                                            foreach($fieldval as $fkey => $fv ) {
+                                                if( $fkey != 'text' ) {
                                                     echo $fkey ;
-                                                    if (isset($fv) )
-                                                    {
+                                                    if (isset($fv) ) {
                                                         echo '="'.$fv.'"';
                                                     }
                                                 }
