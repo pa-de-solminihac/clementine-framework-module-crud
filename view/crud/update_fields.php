@@ -482,7 +482,8 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 echo ' required ';
                             } ?> >
 <?php
-                                    foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
+                             
+                             foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
                                         // hidden if no label is set
 ?>
                         <option
@@ -493,13 +494,41 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             selected="selected"
 <?php
                                         }
-                                        if (!strlen($fieldval)) {
+                                        if(is_array($fieldval))
+                                        { 
+                                            if (!strlen($fieldval['text'])) {
 ?>
                             style="display: none; "
 <?php
-                                        } ?>><?php echo $fieldval; ?></option>
+                                            }
+                                        } else {
+                                            if (!strlen($fieldval)) {
+?>
+                            style="display: none; "
 <?php
+                                            }
+                                        }
+                                        if(is_array($fieldval))
+                                        {
+                                            foreach($fieldval as $fkey => $fv )
+                                            {
+                                                if( $fkey != 'text' )
+                                                {
+                                                    echo $fkey ;
+                                                    if (isset($fv) )
+                                                    {
+                                                        echo '="'.$fv.'"';
+                                                    }
+                                                }
+                                            }
+                                                ?>><?php echo $fieldval['text']; ?></option>
+<?php                                        
+                                        } else {
+                                        ?>><?php echo $fieldval; ?></option>
+<?php
+                                        }
                                     }
+                                    
 ?>
                     </select>
                     <?php echo $commentaire; ?>
