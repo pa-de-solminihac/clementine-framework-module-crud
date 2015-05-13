@@ -468,19 +468,19 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             name="<?php echo $field_class; ?>"
                             class="<?php echo $valueclasses; ?> <?php echo $valueclasses_more; ?>"
                         <?php
-                            if (!empty($fieldmeta['readonly'])) {
-                                echo " readonly ";
-                                echo " disabled ";
-                            }
-                            if (!empty($fieldmeta['disabled'])) {
-                                echo " disabled ";
-                            }
-                            if (!empty($fieldmeta['autofocus'])) {
-                                echo " autofocus ";
-                            }
-                            if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
-                                echo ' required ';
-                            } ?> >
+                                    if (!empty($fieldmeta['readonly'])) {
+                                        echo " readonly ";
+                                        echo " disabled ";
+                                    }
+                                    if (!empty($fieldmeta['disabled'])) {
+                                        echo " disabled ";
+                                    }
+                                    if (!empty($fieldmeta['autofocus'])) {
+                                        echo " autofocus ";
+                                    }
+                                    if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
+                                        echo ' required ';
+                                    } ?> >
 <?php
                                     foreach ($fieldmeta['fieldvalues'] as $fieldkey => $fieldval) {
                                         // hidden if no label is set
@@ -493,12 +493,36 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             selected="selected"
 <?php
                                         }
-                                        if (!strlen($fieldval)) {
+                                        if (is_array($fieldval)) {
+                                            if (!strlen($fieldval['text'])) {
 ?>
                             style="display: none; "
 <?php
-                                        } ?>><?php echo $fieldval; ?></option>
+                                            }
+                                        } else {
+                                            if (!strlen($fieldval)) {
+?>
+                            style="display: none; "
 <?php
+                                            }
+                                        }
+                                        if (is_array($fieldval)) {
+                                            foreach ($fieldval as $fkey => $fv) {
+                                                if ($fkey != 'text') {
+                                                    echo $fkey;
+                                                    if (isset($fv)) {
+                                                        echo '="' . $fv . '"';
+                                                    }
+                                                }
+                                            }
+?>><?php
+                                            echo $fieldval['text']; ?></option>
+<?php
+                                        } else {
+?>><?php
+                                            echo $fieldval; ?></option>
+<?php
+                                        }
                                     }
 ?>
                     </select>
