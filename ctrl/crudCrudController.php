@@ -413,7 +413,7 @@ class crudCrudController extends crudCrudController_Parent
         }
         // enregistre les valeurs si possible
         $last_insert_ids = 0;
-        if (count($_POST)) {
+        if (count($request->POST)) {
             // gere l'upload de fichiers
             $ret = $this->handle_uploading($params, $errors);
             if ($ret) {
@@ -667,7 +667,6 @@ class crudCrudController extends crudCrudController_Parent
         $this->data['button_label_back'] = 'Annuler';
         $this->data['button_label_save'] = 'Enregistrer';
         $this->data['button_label_del'] = 'Supprimer';
-        $errors = array();
         // recupere les valeurs postees
         $this->get_unquoted_gpc($params);
         // charge les metadonnees
@@ -711,7 +710,8 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // enregistre les valeurs si possible
-        if (count($_POST)) {
+        $errors = array();
+        if (count($request->POST)) {
             // gere l'upload de fichiers
             $ret = $this->handle_uploading($params, $errors);
             if ($ret) {
@@ -827,10 +827,10 @@ class crudCrudController extends crudCrudController_Parent
             $this->trigger404();
         }
         $ns = $this->getModel('fonctions');
-        $errors = array();
         // recupere les valeurs postees
         $this->get_unquoted_gpc($params);
         // transmet les donnees
+        $errors = array();
         $to_merge = array();
         $to_merge['errors'] = $errors;
         $to_merge['tables'] = $this->_crud->tables;
