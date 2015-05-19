@@ -182,6 +182,9 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
         //create button
         if (empty($data['hidden_sections']['createbutton'])) {
             $href = __WWW__ . '/' . $data['class'] . '/create';
+            if (isset($data['button_url_create'])) {
+                $href = $data['button_url_create'];
+            }
             foreach ($data['url_parameters'] as $key => $val) {
                 $href = $ns->add_param($href, $key, $val, 1);
             }

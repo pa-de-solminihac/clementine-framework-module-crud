@@ -1425,7 +1425,7 @@ class crudCrudController extends crudCrudController_Parent
     /**
      *  overrideUrlButton : force l'url d'un boutton utilisable depuis le hook override_urls
      *
-     *  @param $button peut valoir back, del, updatebutton, readbutton, duplicatebutton, delbutton
+     *  @param $button peut valoir back, del, updatebutton, readbutton, duplicatebutton, delbutton, create
      *  @param $url ce que l'on veut
      *  @access public
      *  @return void
