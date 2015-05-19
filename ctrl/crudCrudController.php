@@ -420,9 +420,9 @@ class crudCrudController extends crudCrudController_Parent
                 return $ret;
             }
             // nettoie les valeurs postées
-            $params['post'] = $this->sanitize($params['post']);
-            $params['post'] = $this->alter_post($params['post']);
-            $validate_errs = $this->validate($params['post'], $params['get']);
+            $params['post'] = $this->sanitize($params['post'], $params);
+            $params['post'] = $this->alter_post($params['post'], $params);
+            $validate_errs = $this->validate($params['post'], $params['get'], $params);
             $move_errs = array();
             $uploaded_files = array();
             if (!count($validate_errs) && !count($errors)) {
@@ -718,9 +718,9 @@ class crudCrudController extends crudCrudController_Parent
                 return $ret;
             }
             // nettoie les valeurs postées
-            $params['post'] = $this->sanitize($params['post']);
-            $params['post'] = $this->alter_post($params['post']);
-            $validate_errs = $this->validate($params['post'], $params['get']);
+            $params['post'] = $this->sanitize($params['post'], $params);
+            $params['post'] = $this->alter_post($params['post'], $params);
+            $validate_errs = $this->validate($params['post'], $params['get'], $params);
             $move_errs = array();
             $uploaded_files = array();
             if (!count($validate_errs) && !count($errors)) {
