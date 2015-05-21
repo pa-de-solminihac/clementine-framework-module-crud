@@ -299,13 +299,7 @@ class crudCrudController extends crudCrudController_Parent
         $to_merge['values'] = $values;
         $this->merge_values($to_merge);
         // prise en compte des champs ajoutés
-        foreach ($this->data['values'] as $key => $val) {
-            foreach ($this->data['fields'] as $fkey => $fval) {
-                if (!isset($this->data['values'][$key][$fkey])) {
-                    $this->data['values'][$key][$fkey] = '';
-                }
-            }
-        }
+        $this->merge_added_fields($params);
         // recupere le nombre total de resultats (hors limit)
         if (isset($params['sql_calc_found_rows']) && $params['sql_calc_found_rows']) {
             $this->data['nb_total_values'] = $this->getModel('db')->found_rows();
@@ -378,7 +372,6 @@ class crudCrudController extends crudCrudController_Parent
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
-        $this->merge_values($to_merge);
         // fonctions pour faciliter la surcharge
         $this->add_fields($request, $params);
         $this->add_fields_create_or_update($request, $params);
@@ -500,14 +493,7 @@ class crudCrudController extends crudCrudController_Parent
         $to_merge['errors'] = $errors;
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
-        // prise en compte des champs ajoutés
-        foreach ($this->data['values'] as $key => $val) {
-            foreach ($this->data['fields'] as $fkey => $fval) {
-                if (!isset($this->data['values'][$key][$fkey])) {
-                    $this->data['values'][$key][$fkey] = '';
-                }
-            }
-        }
+        $this->merge_added_fields($params);
         if (!isset($params['dont_handle_errors'])) {
             $params['dont_handle_errors'] = false;
         }
@@ -577,13 +563,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
         // prise en compte des champs ajoutés
-        foreach ($this->data['values'] as $key => $val) {
-            foreach ($this->data['fields'] as $fkey => $fval) {
-                if (!isset($this->data['values'][$key][$fkey])) {
-                    $this->data['values'][$key][$fkey] = '';
-                }
-            }
-        }
+        $this->merge_added_fields($params);
         // fonctions pour faciliter la surcharge
         $this->add_fields($request, $params);
         $this->add_fields_read($request, $params);
@@ -676,7 +656,6 @@ class crudCrudController extends crudCrudController_Parent
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
-        $this->merge_values($to_merge);
         // fonctions pour faciliter la surcharge
         $this->add_fields($request, $params);
         $this->add_fields_create_or_update($request, $params);
@@ -758,13 +737,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
         // prise en compte des champs ajoutés
-        foreach ($this->data['values'] as $key => $val) {
-            foreach ($this->data['fields'] as $fkey => $fval) {
-                if (!isset($this->data['values'][$key][$fkey])) {
-                    $this->data['values'][$key][$fkey] = '';
-                }
-            }
-        }
+        $this->merge_added_fields($params);
         if (!isset($params['dont_handle_errors'])) {
             $params['dont_handle_errors'] = false;
         }
@@ -838,7 +811,6 @@ class crudCrudController extends crudCrudController_Parent
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
-        $this->merge_values($to_merge);
         // enregistre les valeurs si possible
         if (count($params['get'])) {
             if (!isset($params['dont_start_transaction'])) {
@@ -1234,6 +1206,11 @@ class crudCrudController extends crudCrudController_Parent
             }
         } else {
             $this->data['fields'][$tablefield] = $fieldmeta;
+        }
+        // ... dans les fields...
+        if (isset($fieldmeta['default_value'])) {
+            $default_val = $fieldmeta['default_value'];
+            $this->data['fields'][$tablefield]['default_value'] = $default_val;
         }
         // ... et dans les valeurs
         if (isset($this->data['values']) && count($this->data['values'])) {
@@ -2093,6 +2070,24 @@ class crudCrudController extends crudCrudController_Parent
         }
         if (isset($to_merge['values'])) {
             $this->data['values'] = $ns->array_replace_recursive($to_merge['values'], $this->data['values']);
+        }
+    }
+
+    // prise en compte des champs ajoutés
+    public function merge_added_fields($params = null)
+    {
+        foreach ($this->data['values'] as $key => $val) {
+            foreach ($this->data['fields'] as $fkey => $fval) {
+                $default_val = '';
+                if ($this->data['formtype'] == 'create' || !empty($params['force_default_value'])) {
+                    if (isset($this->data['fields'][$fkey]['default_value'])) {
+                        $default_val = $this->data['fields'][$fkey]['default_value'];
+                    }
+                }
+                if (empty($this->data['values'][$key][$fkey])) {
+                    $this->data['values'][$key][$fkey] = $default_val;
+                }
+            }
         }
     }
 
