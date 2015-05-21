@@ -281,7 +281,7 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // charge les valeurs
-        $this->register_ui_scripts('index');
+        $this->register_ui_scripts('index', $params);
         if ($cssjs->is_registered_foot('clementine_crud-datatables')) {
             if (isset($params['get']['iDisplayLength'])) {
                 $values = $this->_crud->getList($params);
@@ -449,7 +449,7 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // charge les donnees
-        $this->register_ui_scripts('create');
+        $this->register_ui_scripts('create', $params);
         $values = array(
             0 => ''
         );
@@ -614,7 +614,7 @@ class crudCrudController extends crudCrudController_Parent
         }
         $this->alter_values($request, $params);
         $this->alter_values_read($request, $params);
-        $this->register_ui_scripts('read');
+        $this->register_ui_scripts('read', $params);
     }
 
     /**
@@ -724,7 +724,7 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // charge les donnees
-        $this->register_ui_scripts('update');
+        $this->register_ui_scripts('update', $params);
         // on ne passe pas de parametres supplementaires ici, c'est volontaire
         $values = $this->_crud->get($params['get']);
         if (!is_array($values) || (count($values) !== 1)) {
