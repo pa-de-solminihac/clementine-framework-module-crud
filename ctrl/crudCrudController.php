@@ -413,9 +413,9 @@ class crudCrudController extends crudCrudController_Parent
                 return $ret;
             }
             // nettoie les valeurs postées
-            $params['post'] = $this->sanitize($params['post']);
-            $params['post'] = $this->alter_post($params['post']);
-            $validate_errs = $this->validate($params['post'], $params['get']);
+            $params['post'] = $this->sanitize($params['post'], $params);
+            $params['post'] = $this->alter_post($params['post'], $params);
+            $validate_errs = $this->validate($params['post'], $params['get'], $params);
             $move_errs = array();
             $uploaded_files = array();
             if (!count($validate_errs) && !count($errors)) {
@@ -697,9 +697,9 @@ class crudCrudController extends crudCrudController_Parent
                 return $ret;
             }
             // nettoie les valeurs postées
-            $params['post'] = $this->sanitize($params['post']);
-            $params['post'] = $this->alter_post($params['post']);
-            $validate_errs = $this->validate($params['post'], $params['get']);
+            $params['post'] = $this->sanitize($params['post'], $params);
+            $params['post'] = $this->alter_post($params['post'], $params);
+            $validate_errs = $this->validate($params['post'], $params['get'], $params);
             $move_errs = array();
             $uploaded_files = array();
             if (!count($validate_errs) && !count($errors)) {
@@ -1675,7 +1675,7 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function sanitize($insecure_array)
+    public function sanitize($insecure_array, $params = null)
     {
         // cette fonction est destinée à être surchargée
         // par défaut, on sanitize les dates puis on appelle la fonction sanitize du modele
@@ -1719,7 +1719,7 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function alter_post($insecure_array)
+    public function alter_post($insecure_array, $params = null)
     {
         // cette fonction est destinée à être surchargée
         // pour générer des valeur à partir des champs custom par exemple
@@ -1737,7 +1737,7 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function validate($insecure_values, $insecure_primary_key = null)
+    public function validate($insecure_values, $insecure_primary_key = null, $params = null)
     {
         // fonction destinée à être surchargée
         // par défaut : on vérifie juste si les champs obligatoires sont bien présents
@@ -2127,7 +2127,7 @@ class crudCrudController extends crudCrudController_Parent
      * @access public
      * @return void
      */
-    public function register_ui_scripts($mode = 'index')
+    public function register_ui_scripts($mode = 'index', $params = null)
     {
         $request = $this->getRequest();
         $cssjs = $this->getModel('cssjs');
