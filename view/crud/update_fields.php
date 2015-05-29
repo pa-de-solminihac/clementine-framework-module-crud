@@ -309,6 +309,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             if (!empty($fieldmeta['data-hint'])) {
                                 echo ' data-hint="' . $fieldmeta['data-hint'] . '" ';
                             }
+                            if (!empty($fieldmeta['new_attribute'])) {
+                                foreach ($fieldmeta['new_attribute'] as $key => $value) {
+                                    echo ' ' . $key . '="' . $value . '" ';
+                                }
+                            }
                             if (!empty($fieldmeta['placeholder'])) {
                                 echo ' placeholder="' . $fieldmeta['placeholder'] . '" ';
                             }
@@ -383,6 +388,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             }
                             if (!empty($fieldmeta['data-hint'])) {
                                 echo ' data-hint="' . $fieldmeta['data-hint'] . '" ';
+                            }
+                            if (!empty($fieldmeta['new_attribute'])) {
+                                foreach ($fieldmeta['new_attribute'] as $key => $value) {
+                                    echo ' ' . $key . '="' . $value . '" ';
+                                }
                             }
                             if (!empty($fieldmeta['placeholder'])) {
                                 echo ' placeholder="' . $fieldmeta['placeholder'] . '" ';
@@ -574,6 +584,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 }
                                 if (!empty($fieldmeta['placeholder'])) {
                                     echo ' placeholder="' . $fieldmeta['placeholder'] . '" ';
+                                }
+                                if (!empty($fieldmeta['new_attribute'])) {
+                                    foreach ($fieldmeta['new_attribute'] as $key => $value) {
+                                        echo ' ' . $key . '="' . $value . '" ';
+                                    }
                                 }
                                 if (!empty($data['alldata']['metas']['mandatory_fields'][$tablefield])) {
                                     echo ' required ';

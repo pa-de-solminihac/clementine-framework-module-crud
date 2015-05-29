@@ -1365,6 +1365,15 @@ class crudCrudController extends crudCrudController_Parent
      *          'size' => taille du champ
      *          'comment' => texte d'aide
      *      )
+     *      On peut également rajouter des attributs dans les champs input et text_area avec
+     *      $this->overrideField($nomchamp, array(
+     *          'new_attribute' => array(
+     *              'min' => 10
+     *           )
+     *      ))
+     *      Cette exemple rajoutera l'attribut min qui aura pour valeur 10
+     *  
+     *
      * @param mixed $parameters : tableau de paramètres spécifiques selon le type choisi
      *      Par exemple pour un type 'file' on pourra avoir :
      *      $parameters = array(
