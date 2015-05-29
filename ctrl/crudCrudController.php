@@ -372,6 +372,7 @@ class crudCrudController extends crudCrudController_Parent
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
+        $this->merge_values($to_merge);
         // fonctions pour faciliter la surcharge
         $this->add_fields($request, $params);
         $this->add_fields_create_or_update($request, $params);
@@ -494,18 +495,24 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_defaults($to_merge);
         $this->merge_values($to_merge);
         $this->merge_added_fields($params);
+        $this->alter_values($request, $params);
+        $this->alter_values_create_or_update($request, $request, $params);
         if (!isset($params['dont_handle_errors'])) {
             $params['dont_handle_errors'] = false;
         }
         if (count($params['post'])) {
+            // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors', 
+            // leur appel de handle_uploading peut faire qu'elles retournent retourne dontGetBlock au lieu de $errors...
+            // il faut alors faire suivre le return directement !
+            if ($errors == $this->dontGetBlock()) {
+                return $errors;
+            }
             if (!$params['dont_handle_errors']) {
                 return $this->handle_errors($request, $errors, $params);
             } else {
                 return $errors;
             }
         }
-        $this->alter_values($request, $params);
-        $this->alter_values_create_or_update($request, $request, $params);
     }
 
     /**
@@ -656,6 +663,7 @@ class crudCrudController extends crudCrudController_Parent
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
+        $this->merge_values($to_merge);
         // fonctions pour faciliter la surcharge
         $this->add_fields($request, $params);
         $this->add_fields_create_or_update($request, $params);
@@ -738,18 +746,24 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_values($to_merge);
         // prise en compte des champs ajoutés
         $this->merge_added_fields($params);
+        $this->alter_values($request, $params);
+        $this->alter_values_create_or_update($request, $params);
         if (!isset($params['dont_handle_errors'])) {
             $params['dont_handle_errors'] = false;
         }
         if (count($params['post'])) {
+            // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors', 
+            // leur appel de handle_uploading peut faire qu'elles retournent retourne dontGetBlock au lieu de $errors...
+            // il faut alors faire suivre le return directement !
+            if ($errors == $this->dontGetBlock()) {
+                return $errors;
+            }
             if (!$params['dont_handle_errors']) {
                 return $this->handle_errors($request, $errors, $params);
             } else {
                 return $errors;
             }
         }
-        $this->alter_values($request, $params);
-        $this->alter_values_create_or_update($request, $params);
     }
 
     /**
@@ -811,6 +825,7 @@ class crudCrudController extends crudCrudController_Parent
         /*$to_merge['fields']  = $this->_crud->fields;*/
         $to_merge['mapping'] = $this->mapping_to_HTML;
         $this->merge_defaults($to_merge);
+        $this->merge_values($to_merge);
         // enregistre les valeurs si possible
         if (count($params['get'])) {
             if (!isset($params['dont_start_transaction'])) {
@@ -1769,6 +1784,12 @@ class crudCrudController extends crudCrudController_Parent
 
     public function handle_errors($request, $errors, $params = null)
     {
+        // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors', 
+        // leur appel de handle_uploading peut faire qu'elles retournent retourne dontGetBlock au lieu de $errors...
+        // il faut alors faire suivre le return directement !
+        if ($errors == $this->dontGetBlock()) {
+            return $errors;
+        }
         $request = $this->getRequest();
         $ns = $this->getModel('fonctions');
         $values = $ns->array_first($this->data['values']);
