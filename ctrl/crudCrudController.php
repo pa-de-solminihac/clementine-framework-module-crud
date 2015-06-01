@@ -1379,6 +1379,7 @@ class crudCrudController extends crudCrudController_Parent
      *          'type' => type choisi dans le tableau $this->mapping_to_HTML
      *          'size' => taille du champ
      *          'comment' => texte d'aide
+     *          'custom_attr' => tableau clé-valeur d'attributs supplémentaires pour les champs input et textarea
      *      )
      * @param mixed $parameters : tableau de paramètres spécifiques selon le type choisi
      *      Par exemple pour un type 'file' on pourra avoir :
