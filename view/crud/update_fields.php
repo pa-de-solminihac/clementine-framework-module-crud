@@ -309,8 +309,8 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             if (!empty($fieldmeta['data-hint'])) {
                                 echo ' data-hint="' . $fieldmeta['data-hint'] . '" ';
                             }
-                            if (!empty($fieldmeta['new_attribute'])) {
-                                foreach ($fieldmeta['new_attribute'] as $key => $value) {
+                            if (!empty($fieldmeta['custom_attr'])) {
+                                foreach ($fieldmeta['custom_attr'] as $key => $value) {
                                     echo ' ' . $key . '="' . $value . '" ';
                                 }
                             }
@@ -389,8 +389,8 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                             if (!empty($fieldmeta['data-hint'])) {
                                 echo ' data-hint="' . $fieldmeta['data-hint'] . '" ';
                             }
-                            if (!empty($fieldmeta['new_attribute'])) {
-                                foreach ($fieldmeta['new_attribute'] as $key => $value) {
+                            if (!empty($fieldmeta['custom_attr'])) {
+                                foreach ($fieldmeta['custom_attr'] as $key => $value) {
                                     echo ' ' . $key . '="' . $value . '" ';
                                 }
                             }
@@ -585,8 +585,8 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 if (!empty($fieldmeta['placeholder'])) {
                                     echo ' placeholder="' . $fieldmeta['placeholder'] . '" ';
                                 }
-                                if (!empty($fieldmeta['new_attribute'])) {
-                                    foreach ($fieldmeta['new_attribute'] as $key => $value) {
+                                if (!empty($fieldmeta['custom_attr'])) {
+                                    foreach ($fieldmeta['custom_attr'] as $key => $value) {
                                         echo ' ' . $key . '="' . $value . '" ';
                                     }
                                 }
