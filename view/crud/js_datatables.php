@@ -1,5 +1,16 @@
+<?php
+    $iDisplayLength = 10;
+    if (!empty(Clementine::$config['module_jquerydatatables']['iDisplayLength']) || !empty($data['iDisplayLength'])) {
+        if (!empty($data['iDisplayLength'])) {
+            $iDisplayLength = $data['iDisplayLength'];
+        } else {
+            $iDisplayLength = Clementine::$config['module_jquerydatatables']['iDisplayLength'];
+        }
+    }
+?>
 <script type="text/javascript">
     // si jQuery est chargé
+    var iDisplayLength = <?php echo (int) $iDisplayLength; ?>;
     if (typeof(jQuery) != "undefined") {
         // effet hover sur les colonnes
         jQuery(document).ready(function() {
@@ -39,7 +50,7 @@ if (Clementine::$config['module_jquerydatatables']['nb_res_datatables']) {
                 },
                 "sAjaxSource": "<?php echo $request->EQUIV[$request->LANG]; ?>",
                 "sServerMethod": "GET",
-                "iDisplayLength": 10,
+                "iDisplayLength": iDisplayLength,
                 "oLanguage": {
                     "sUrl": "<?php echo __WWW_ROOT_JQUERYDATATABLES__; ?>/skin/locale/<?php echo $request->LANG; ?>.txt"
                 },
