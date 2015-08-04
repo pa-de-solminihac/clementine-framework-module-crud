@@ -97,8 +97,12 @@ foreach ($firstrow as $tablefield => $val) {
     }
 }
 if (!(isset($data['return_json']) && $data['return_json'])) {
+	if (empty($data['hidden_sections']['actions'])) {
 ?>
             <col class="clementine_crud-list_table_col_actions" />
+<?php
+	}
+?>
         </colgroup>
         <thead>
             <tr>
@@ -133,23 +137,27 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
 <?php
         }
     }
+    if (empty($data['hidden_sections']['actions'])) {
 ?>
                 <th class="clementine_crud-list_table_th_actions no_autoclick"><?php
-    //xls export button
-    if (empty($data['hidden_sections']['xlsbutton'])) {
-        $button_label = $data["button_label_xls"];
-        $href = $ns->add_param($request->FULLURL, 'export_xls');
-        $href = $ns->add_param($href, 'sEcho', '1');
-        foreach ($data['url_parameters'] as $key => $val) {
-            $href = $ns->add_param($href, $key, $val, 1);
-        }
+		//xls export button
+		if (empty($data['hidden_sections']['xlsbutton'])) {
+			$button_label = $data["button_label_xls"];
+			$href = $ns->add_param($request->FULLURL, 'export_xls');
+			$href = $ns->add_param($href, 'sEcho', '1');
+			foreach ($data['url_parameters'] as $key => $val) {
+				$href = $ns->add_param($href, $key, $val, 1);
+			}
 ?>
     <a class="clementine_crud-xlsbutton clementine_crud-list-xlsbutton <?php echo implode(' ', $data['more_classes_xlsbutton']); ?>" href="<?php echo $href; ?>" title="<?php echo $button_label; ?>">
         <i class="glyphicon glyphicon-download"></i><span class="text-hide"><?php echo $button_label; ?></span>
     </a>
 <?php
-    }
+		}
 ?></th>
+<?php
+	}
+?>
             </tr>
         </thead>
         <tbody>
