@@ -3,7 +3,7 @@ $ns = $this->getModel('fonctions');
 $row = array();
 if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
-	<tr>
+    <tr>
 <?php
 }
 if ($data['alldata']['formtype'] != 'none') {
@@ -111,26 +111,26 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     }
 }
 if (empty($data['alldata']['hidden_sections']['actions'])) {
-	$out = $this->getBlockHtml($data['alldata']['class'] . '/index_actions', array(
-		'current_key' => $data['current_key'],
-		'ligne' => $data['ligne'],
-		'alldata' => $data['alldata']
-	), $request);
-	if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
+    $out = $this->getBlockHtml($data['alldata']['class'] . '/index_actions', array(
+        'current_key' => $data['current_key'],
+        'ligne' => $data['ligne'],
+        'alldata' => $data['alldata']
+    ), $request);
+    if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
-		<td>
+        <td>
 <?php
     echo str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __WWW_ROOT__, $out);
 ?>
-		</td>
+        </td>
 <?php
-	} else {
-		$row[] = $out;
-	}
+    } else {
+        $row[] = $out;
+    }
 }
 if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
-	</tr>
+    </tr>
 <?php
 }
 if (isset($data['alldata']['return_json']) && $data['alldata']['return_json']) {
