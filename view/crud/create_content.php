@@ -1,5 +1,5 @@
 <div class="clementine_crud-<?php echo $data['formtype']; ?>_div <?php echo implode(' ', $data['more_classes_wrap']); ?>">
-    <form class="clementine_crud-<?php echo $data['formtype']; ?>_form clementine_crud-form <?php echo implode(' ', $data['more_classes_form']); ?>" action="" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+    <form class="clementine_crud-<?php echo $data['formtype']; ?>_form clementine_crud-form <?php echo implode(' ', $data['more_classes_form']); ?>" action="<?php echo $request->FULLURL; ?>" method="post" accept-charset="utf-8" enctype="multipart/form-data">
 <?php
 if (is_array($data['values']) && (count($data['values']) == 1)) {
     foreach ($data['values'] as $current_key => $ligne) {

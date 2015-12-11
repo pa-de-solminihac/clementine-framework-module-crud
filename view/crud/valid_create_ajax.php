@@ -89,6 +89,8 @@
                         document.location = msg.substring(1);
                         retour = 0;
                     }
+                },
+                error: function(xhr) {
                 }
             });
             if (retour) {

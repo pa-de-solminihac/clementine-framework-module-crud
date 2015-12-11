@@ -217,6 +217,7 @@ class crudCrudController extends crudCrudController_Parent
         }
         // liste des champs affiches
         $champs_affiches = array();
+        $champs_recherche = array();
         $firstrow = $this->data['fields'];
         foreach ($firstrow as $tablefield => $val) {
             $fieldmeta = $this->data['fields'][$tablefield];
@@ -226,6 +227,10 @@ class crudCrudController extends crudCrudController_Parent
             }
             if (!$hidden) {
                 $champs_affiches[] = $tablefield;
+                $champs_recherche[] = $tablefield;
+            }
+            if (isset($this->data['metas']['search_fields'][$tablefield])) {
+                $champs_recherche[] = $tablefield;
             }
         }
         // sorting / ordering
@@ -257,7 +262,7 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         // filtering (recherche dans les champs affichés uniquement)
-        $filter_where = $this->handle_ajax_filtering($champs_affiches, $this->data['metas'], $params);
+        $filter_where = $this->handle_ajax_filtering($champs_recherche, $this->data['metas'], $params);
         if ($filter_where) {
             if (!isset($params['where'])) {
                 $params['where'] = ' 1 ';
@@ -501,7 +506,7 @@ class crudCrudController extends crudCrudController_Parent
             $params['dont_handle_errors'] = false;
         }
         if (count($params['post'])) {
-            // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors', 
+            // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors',
             // leur appel de handle_uploading peut faire qu'elles retournent retourne dontGetBlock au lieu de $errors...
             // il faut alors faire suivre le return directement !
             if ($errors == $this->dontGetBlock()) {
@@ -752,7 +757,7 @@ class crudCrudController extends crudCrudController_Parent
             $params['dont_handle_errors'] = false;
         }
         if (count($params['post'])) {
-            // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors', 
+            // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors',
             // leur appel de handle_uploading peut faire qu'elles retournent retourne dontGetBlock au lieu de $errors...
             // il faut alors faire suivre le return directement !
             if ($errors == $this->dontGetBlock()) {
@@ -1696,7 +1701,7 @@ class crudCrudController extends crudCrudController_Parent
         // cette fonction est destinée à être surchargée
         // par défaut, on sanitize les dates puis on appelle la fonction sanitize du modele
         $secure_array = $this->_crud->sanitizeValues($insecure_array);
-        foreach ($insecure_array as $fieldkey => $fieldval) {
+        foreach ($secure_array as $fieldkey => $fieldval) {
             $tablefield = str_replace('-', '.', $fieldkey);
             if (isset($this->data['fields'][$tablefield]) && isset($this->data['fields'][$tablefield]['type'])) {
                 switch ($this->data['fields'][$tablefield]['type']) {
@@ -1715,6 +1720,13 @@ class crudCrudController extends crudCrudController_Parent
                     ));
                     break;
                 case 'datetime':
+                    // padding date to datetime format
+                    $date_format = '0000-00-00 00:00';
+                    $date_padding_length = max(0, mb_strlen($date_format) - mb_strlen($secure_array[$fieldkey]));
+                    $date_padding_string = mb_substr($date_format, - $date_padding_length);
+                    if ($date_padding_length > 0) {
+                        $secure_array[$fieldkey] = $secure_array[$fieldkey] . $date_padding_string;
+                    }
                     $secure_array[$fieldkey] = filter_var($secure_array[$fieldkey], FILTER_VALIDATE_REGEXP, array(
                         "options" => array(
                             "regexp" => "/^\d{4}-\d{2}-\d{2} ([01][0-9]|(2[0-3])):[0-5][0-9]$/"
@@ -1785,7 +1797,7 @@ class crudCrudController extends crudCrudController_Parent
 
     public function handle_errors($request, $errors, $params = null)
     {
-        // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors', 
+        // si on a surchargé createAction ou updateAction en leur passant "dont_handle_errors',
         // leur appel de handle_uploading peut faire qu'elles retournent retourne dontGetBlock au lieu de $errors...
         // il faut alors faire suivre le return directement !
         if ($errors == $this->dontGetBlock()) {
@@ -2201,13 +2213,13 @@ class crudCrudController extends crudCrudController_Parent
     /**
      * handle_ajax_filtering : datatables ajax filtering (recherche dans les champs affichés uniquement)
      *
-     * @param mixed $champs_affiches
+     * @param mixed $champs_recherche
      * @param mixed $metas
      * @param mixed $params
      * @access public
      * @return void
      */
-    public function handle_ajax_filtering($champs_affiches, $metas, $params = null)
+    public function handle_ajax_filtering($champs_recherche, $metas, $params = null)
     {
         $db = $this->getModel('db');
         $filter_where = '';
@@ -2221,22 +2233,25 @@ class crudCrudController extends crudCrudController_Parent
         }
         if ($sSearch != "") {
             $ns = $this->getModel('fonctions');
-            foreach ($champs_affiches as $champ_affiche) {
-                $nom_champ_affiche = $champ_affiche;
-                if (isset($this->data['fields'][$champ_affiche]) && $this->data['fields'][$champ_affiche]['type'] == 'custom_field') {
-                    if (isset($metas['custom_fields'][$champ_affiche])) {
-                        $nom_champ_affiche = $metas['custom_fields'][$champ_affiche];
+            // boucler sur les champs dans lesquels rechercher -> liste des champs par défaut si non définie
+            // pouvoir définir dans quels champs rechercher
+            // $metas fields_search
+            foreach ($champs_recherche as $champ_recherche) {
+                $nom_champ_affiche = $champ_recherche;
+                if (isset($this->data['fields'][$champ_recherche]) && $this->data['fields'][$champ_recherche]['type'] == 'custom_field') {
+                    if (isset($metas['custom_fields'][$champ_recherche])) {
+                        $nom_champ_affiche = $metas['custom_fields'][$champ_recherche];
                     } else {
                         // champ custom_field qui n'a aucune définition SQL
                         continue;
                     }
                 }
-                if (isset($metas['custom_search'][$champ_affiche])) {
-                    if ($metas['custom_search'][$champ_affiche] != '0') {
+                if (isset($metas['custom_search'][$champ_recherche])) {
+                    if ($metas['custom_search'][$champ_recherche] != '0') {
                         // si le custom_field est un GROUP_CONCAT par exemple, on ne peut pas faire un like directement sur GROUP_CONCAT(monchamp), donc on le fait directement sur monchamp
-                        $filter_where.= "\n    " . $metas['custom_search'][$champ_affiche] . " LIKE '%" . $db->escape_string($sSearch) . "%' OR ";
+                        $filter_where.= "\n    " . $metas['custom_search'][$champ_recherche] . " LIKE '%" . $db->escape_string($sSearch) . "%' OR ";
                         // recherche aussi la version encodée en HTML
-                        $filter_where.= "\n    " . $metas['custom_search'][$champ_affiche] . " LIKE '%" . $db->escape_string($ns->htmlentities($sSearch, ENT_QUOTES)) . "%' OR ";
+                        $filter_where.= "\n    " . $metas['custom_search'][$champ_recherche] . " LIKE '%" . $db->escape_string($ns->htmlentities($sSearch, ENT_QUOTES)) . "%' OR ";
                     }
                 } else {
                     $filter_where.= "\n    " . $nom_champ_affiche . " LIKE '%" . $db->escape_string($sSearch) . "%' OR ";
