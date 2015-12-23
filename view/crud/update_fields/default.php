@@ -1,7 +1,7 @@
 <?php
 $tableField = $data['tablefield']; // case is important for backward compatibility
 extract($data, EXTR_SKIP);
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 echo $label_open;
 echo $label_close;
 ?>

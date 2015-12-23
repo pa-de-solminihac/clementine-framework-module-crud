@@ -1,5 +1,5 @@
 <?php
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
     $md5BrowseButton = md5($browseButton);
 ?>
@@ -33,7 +33,7 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
 <?php
     } else {
 ?>
-                max_file_size : '<?php echo $this->getModel('fonctions')->get_max_filesize(); ?>b',
+                max_file_size : '<?php echo Clementine::getModel('fonctions')->get_max_filesize(); ?>b',
 <?php
     }
     // extensions autorisees

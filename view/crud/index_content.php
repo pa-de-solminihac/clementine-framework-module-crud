@@ -1,6 +1,6 @@
 <?php
-$ns = $this->getModel('fonctions');
-$config = $this->getModuleConfig();
+$ns = Clementine::getModel('fonctions');
+$config = Clementine::getModuleConfig();
 // tableau pour la ligne de titre
 $firstrow = array();
 foreach ($data['fields'] as $tablefield => $fieldmeta) {
@@ -165,7 +165,7 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
 }
 // valeurs
 foreach ($data['values'] as $current_key => $ligne) {
-    $out = $this->getBlockHtml(
+    $out = Clementine::getBlockHtml(
         $data['class'] . '/index_rows',
         array(
             'current_key' => $current_key,

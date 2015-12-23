@@ -1,5 +1,5 @@
 <?php
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 $current_key = $ns->htmlentities($data['current_key']);
 $arrayUrl = array('updatebutton' => __WWW__ . '/' . $data['alldata']['class'] . '/update?' . $current_key,
                   'readbutton' => __WWW__ . '/' . $data['alldata']['class'] . '/read?' . $current_key,

@@ -1,5 +1,5 @@
 <?php
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
     if (!array_key_exists($tableField, $data['ligne'])) { // array_key_exists !== isset
         continue;
@@ -40,7 +40,7 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
         foreach ($reverse_wrappers as $wrapper) {
             if ($wrapper['opening_block']) {
                 //echo $wrapper['opening_block'] . PHP_EOL;
-                $this->getBlock($wrapper['opening_block'], $data, $request);
+                Clementine::getBlock($wrapper['opening_block'], $data, $request);
             }
         }
     }
@@ -107,9 +107,9 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
 
         // load custom block instead if available
         $customBlockPath = $data['alldata']['class'] . '/update_fields/custom_' . $tableField;
-        $hasCustomBlock = $this->canGetBlock($customBlockPath);
+        $hasCustomBlock = Clementine::canGetBlock($customBlockPath);
         if ($hasCustomBlock) {
-            $this->getBlock($customBlockPath, $alldata, $request);
+            Clementine::getBlock($customBlockPath, $alldata, $request);
         } elseif ($doDisplayValues) {
             if ($mapping != 'hidden') {
                 $rowDivClasses = "clementine_crud-row ";
@@ -127,13 +127,13 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
             case 'textarea':
             case 'radio':
                 $real_mapping = $mapping;
-                $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
+                Clementine::getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
                 break;
 
             case 'checkbox':
             case 'togglebutton':
                 $real_mapping = 'checkbox';
-                $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
+                Clementine::getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
                 break;
 
             case 'date':
@@ -142,7 +142,7 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
             case 'month':
             case 'week':
                 $real_mapping = 'datetime';
-                $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
+                Clementine::getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
                 break;
 
             case 'span':
@@ -156,7 +156,7 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
             case 'tel':
             case 'url':
                 $real_mapping = 'html5';
-                $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
+                Clementine::getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
                 break;
 
             default:
@@ -164,7 +164,7 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
                     break;
                 }
                 $real_mapping = 'default';
-                $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
+                Clementine::getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
                 break;
             }
             if ($mapping != 'hidden') {
@@ -182,7 +182,7 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
         foreach ($wrappers as $wrapper) {
             if ($wrapper['closing_block']) {
                 //echo $wrapper['closing_block'] . PHP_EOL;
-                $this->getBlock($wrapper['closing_block'], $data, $request);
+                Clementine::getBlock($wrapper['closing_block'], $data, $request);
             }
         }
     }

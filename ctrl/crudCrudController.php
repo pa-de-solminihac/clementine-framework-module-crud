@@ -116,7 +116,7 @@ class crudCrudController extends crudCrudController_Parent
             return false;
         }
         $this->set_options($request, $params);
-        $this->_crud = $this->getModel($this->_class, $params);
+        $this->_crud = Clementine::getModel($this->_class, $params);
         if (!isset($this->data['class'])) {
             $this->data['class'] = $this->_class;
         }
@@ -160,7 +160,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->data['button_label_create'] = 'Nouveau';
         $this->data['button_label_xls'] = 'Exporter';
         // autoclick configurable dans le .ini
-        $config = $this->getModuleConfig();
+        $config = Clementine::getModuleConfig();
         $this->data['datetime_format'] = $config['default_datetime_format'];
         $this->data['date_format'] = $config['default_date_format'];
         $this->data['time_format'] = $config['default_time_format'];
@@ -276,10 +276,10 @@ class crudCrudController extends crudCrudController_Parent
             }
             $params['where'].= ' AND (' . $filter_where . ') ';
         }
-        $cssjs = $this->getModel('cssjs');
+        $cssjs = Clementine::getModel('cssjs');
         // charge les valeurs pour les clés étrangères
         if ($this->getOption('autoload_foreign_keys_values')) {
-            $db = $this->getModel('db');
+            $db = Clementine::getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
@@ -314,7 +314,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_added_fields($params);
         // recupere le nombre total de resultats (hors limit)
         if (isset($params['sql_calc_found_rows']) && $params['sql_calc_found_rows']) {
-            $this->data['nb_total_values'] = $this->getModel('db')->found_rows();
+            $this->data['nb_total_values'] = Clementine::getModel('db')->found_rows();
         } else {
             $this->data['nb_total_values'] = count($this->data['values']);
         }
@@ -333,11 +333,11 @@ class crudCrudController extends crudCrudController_Parent
         // export xls si demande
         if (isset($this->data['return_json']) && $this->data['return_json'] && isset($this->data['export_xls'])) {
             if (isset($this->data['export_xls'])) {
-                $a_exporter = unserialize($this->getBlockHtml($this->data['class'] . '/index', $this->data, $request));
+                $a_exporter = unserialize(Clementine::getBlockHtml($this->data['class'] . '/index', $this->data, $request));
                 if (isset($this->data['export_xls_onlydata'])) {
                     return $a_exporter;
                 }
-                $ns = $this->getModel('fonctions');
+                $ns = Clementine::getModel('fonctions');
                 $ns->matrix2xls($a_exporter['filename'], $a_exporter['donnees'], $a_exporter['header_titles']);
             }
         }
@@ -354,7 +354,7 @@ class crudCrudController extends crudCrudController_Parent
         $config = $this->getModuleConfig();
         $this->need_privileges($request, $params);
         $this->need_privileges_create_or_update($request, $params);
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
@@ -405,7 +405,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->override_url_create_or_update($request, $params);
         // charge les valeurs pour les clés étrangères
         if ($this->getOption('autoload_foreign_keys_values')) {
-            $db = $this->getModel('db');
+            $db = Clementine::getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
@@ -562,7 +562,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->get_unquoted_gpc($params);
         // charge les valeurs pour les clés étrangères
         if ($this->getOption('autoload_foreign_keys_values')) {
-            $db = $this->getModel('db');
+            $db = Clementine::getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
@@ -612,7 +612,7 @@ class crudCrudController extends crudCrudController_Parent
         // pas d'element, ou en tout cas pas accessible... on renvoie un header 404
         if (!count($this->data['values'])) {
             if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
-                $this->getHelper('debug')->unknown_element();
+                Clementine::getHelper('debug')->unknown_element();
             }
             $this->trigger404();
         }
@@ -621,7 +621,7 @@ class crudCrudController extends crudCrudController_Parent
             //TODO: (code obsolète supprimé)
         //}
         // affiche le fichier demande avec les memes droits que l'objet
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         $tablefield = $ns->ifGet('string', 'file');
         if ($tablefield && isset($this->data['fields'][$tablefield]) && ($this->data['fields'][$tablefield]['type'] == 'file')) {
             $values = $ns->array_first($this->data['values']);
@@ -633,7 +633,7 @@ class crudCrudController extends crudCrudController_Parent
                     $ns->send_file($file_path, $visible_name);
                 } else {
                     if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
-                        $this->getHelper('debug')->unknown_element();
+                        Clementine::getHelper('debug')->unknown_element();
                     }
                     $this->trigger404();
                 }
@@ -705,7 +705,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->override_url_create_or_update($request, $params);
         // charge les valeurs pour les clés étrangères
         if ($this->getOption('autoload_foreign_keys_values')) {
-            $db = $this->getModel('db');
+            $db = Clementine::getModel('db');
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
@@ -810,7 +810,7 @@ class crudCrudController extends crudCrudController_Parent
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
         }
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         $filename = $ns->ifGet('string', 'file');
         // securise le nom de fichier
         $filename = preg_replace('/[^a-zA-Z0-9-\.]/', '', $filename);
@@ -859,7 +859,7 @@ class crudCrudController extends crudCrudController_Parent
         if (get_class($this) == 'CrudController') {
             $this->trigger404();
         }
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         // recupere les valeurs postees
         $this->get_unquoted_gpc($params);
         // transmet les donnees
@@ -1241,7 +1241,7 @@ class crudCrudController extends crudCrudController_Parent
     public function addField($tablefield, $before_tablefield = null, $field_definition = null, $fieldmeta = null)
     {
         // ajoute le champ $tablefield dans les entetes...
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         if (isset($fieldmeta['type'])) {
             $fieldmeta['custom_type'] = $fieldmeta['type'];
         }
@@ -1314,7 +1314,7 @@ class crudCrudController extends crudCrudController_Parent
     public function moveField($tablefield, $before_tablefield = null)
     {
         // deplace le champ $tablefield juste avant le champ $before_tablefield...
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         // ... dans les entetes...
         $fieldmeta = $this->data['fields'][$tablefield];
         if ($before_tablefield) {
@@ -1445,7 +1445,7 @@ class crudCrudController extends crudCrudController_Parent
             }
         }
         if (!empty($parameters)) {
-            $ns = $this->getModel('fonctions');
+            $ns = Clementine::getModel('fonctions');
             if (!isset($this->data['fields'][$tablefield]['parameters'])) {
                 $this->data['fields'][$tablefield]['parameters'] = array();
             }
@@ -1569,7 +1569,7 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function getFieldValue($tablefield)
     {
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         $first_key = $ns->array_first_key($this->data['values']);
         if (!empty($this->data['values'][$first_key][$tablefield])) {
             return $this->data['values'][$first_key][$tablefield];
@@ -1594,7 +1594,7 @@ class crudCrudController extends crudCrudController_Parent
         if (!count($this->data['values'])) {
             return false;
         }
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         $first_key = $ns->array_first_key($this->data['values']);
         if (empty($this->data['values'][$first_key][$tablefield])) {
             $this->data['values'][$first_key][$tablefield] = $default_value;
@@ -1682,9 +1682,9 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function wrapFields($wrapper)
     {
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         if (!is_array($wrapper)) {
-            $this->getHelper('debug')->wrapFields_wrong_params($wrapper);
+            Clementine::getHelper('debug')->wrapFields_wrong_params($wrapper);
         }
         $wrapper_keys = array_keys($wrapper);
         $from_fieldkey = $wrapper_keys[0];
@@ -1700,10 +1700,10 @@ class crudCrudController extends crudCrudController_Parent
         $from_tablefield = str_replace('-', '.', $from_fieldkey);
         $to_tablefield = str_replace('-', '.', $to_fieldkey);
         if (!isset($this->data['fields'][$from_tablefield])) {
-            $this->getHelper('debug')->unknown_field($from_fieldkey);
+            Clementine::getHelper('debug')->unknown_field($from_fieldkey);
         }
         if (!isset($this->data['fields'][$to_tablefield])) {
-            $this->getHelper('debug')->unknown_field($to_fieldkey);
+            Clementine::getHelper('debug')->unknown_field($to_fieldkey);
         }
         // enregistrement du wrapper
         $wrapper = array(
@@ -1844,8 +1844,8 @@ class crudCrudController extends crudCrudController_Parent
         if ($errors == $this->dontGetBlock()) {
             return $errors;
         }
-        $request = $this->getRequest();
-        $ns = $this->getModel('fonctions');
+        $request = Clementine::getRequest();
+        $ns = Clementine::getModel('fonctions');
         $values = $ns->array_first($this->data['values']);
         if (!count($errors)) {
             if (empty($params['url_retour'])) {
@@ -1876,7 +1876,7 @@ class crudCrudController extends crudCrudController_Parent
                 // valeur de retour pour AJAX
                 echo '1';
             }
-            $this->getBlock($this->_class . '/errors', array(
+            Clementine::getBlock($this->_class . '/errors', array(
                 'errors' => $errors
             ), $request);
             die();
@@ -1891,7 +1891,7 @@ class crudCrudController extends crudCrudController_Parent
 
     public function handle_uploading(&$params, &$errors)
     {
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         // determine upload_max_filesize
         $default_upload_max_filesize = $ns->get_max_filesize();
         $session_crud_uploaded_files = 'crud_uploaded_files';
@@ -1991,7 +1991,7 @@ class crudCrudController extends crudCrudController_Parent
 
     public function handle_uploaded_files(&$params, &$errors, $mode = 'update')
     {
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         // deplacement des fichiers uploades
         $move_errs = array();
         $uploaded_files = array();
@@ -2152,7 +2152,7 @@ class crudCrudController extends crudCrudController_Parent
 
     public function merge_defaults($to_merge)
     {
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         $default_fields = array(
             'errors',
             'tables',
@@ -2173,7 +2173,7 @@ class crudCrudController extends crudCrudController_Parent
 
     public function merge_fields($to_merge)
     {
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         if (!isset($this->data['fields'])) {
             $this->data['fields'] = array();
         }
@@ -2184,7 +2184,7 @@ class crudCrudController extends crudCrudController_Parent
 
     public function merge_values($to_merge)
     {
-        $ns = $this->getModel('fonctions');
+        $ns = Clementine::getModel('fonctions');
         if (!isset($this->data['values'])) {
             $this->data['values'] = array();
         }
@@ -2221,7 +2221,7 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function get_unquoted_gpc(&$params)
     {
-        $request = $this->getRequest();
+        $request = Clementine::getRequest();
         if (!$params) {
             $params = array();
         }
@@ -2249,11 +2249,11 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function register_ui_scripts($mode = 'index', $params = null)
     {
-        $request = $this->getRequest();
-        $cssjs = $this->getModel('cssjs');
+        $request = Clementine::getRequest();
+        $cssjs = Clementine::getModel('cssjs');
         // jQuery
         $cssjs->register_foot('jquery', array(
-            'src' => $this->getHelper('jquery')->getUrl()
+            'src' => Clementine::getHelper('jquery')->getUrl()
         ));
         if (in_array($mode, array('create', 'update'))) {
             // plupload : ajax upload
@@ -2269,17 +2269,17 @@ class crudCrudController extends crudCrudController_Parent
             $cssjs->register_foot('plupload.i18n', array(
                 'src' => __WWW_ROOT_PLUPLOAD__ . '/skin/js/i18n/' . $request->LANG . '.js'
             ));
-            $cssjs->register_foot('clementine_crud-plupload', $this->getBlockHtml($this->_class . '/js_plupload', $this->data, $request));
+            $cssjs->register_foot('clementine_crud-plupload', Clementine::getBlockHtml($this->_class . '/js_plupload', $this->data, $request));
             //validation AJAX
-            $cssjs->register_foot('valid_' . $mode . '_ajax', $this->getBlockHtml($this->_class . '/valid_' . $mode . '_ajax', $this->data, $request));
-            $cssjs->register_foot($this->_class . '_datepicker', $this->getBlockHtml($this->_class . '/js_datepicker', $this->data));
+            $cssjs->register_foot('valid_' . $mode . '_ajax', Clementine::getBlockHtml($this->_class . '/valid_' . $mode . '_ajax', $this->data, $request));
+            $cssjs->register_foot($this->_class . '_datepicker', Clementine::getBlockHtml($this->_class . '/js_datepicker', $this->data));
         }
         if (in_array($mode, array('index', 'create', 'update'))) {
             $cssjs->register_css('valid_' . $mode . '_css', array(
                 'src' => __WWW_ROOT_CRUD__ . '/skin/css/clementine_crud.css'
             ));
             // table autoclick effects
-            $cssjs->register_foot('clementine_crud-list_table_autoclick', $this->getBlockHtml($this->_class . '/js_list_table_autoclick', $this->data, $request));
+            $cssjs->register_foot('clementine_crud-list_table_autoclick', Clementine::getBlockHtml($this->_class . '/js_list_table_autoclick', $this->data, $request));
             // dataTables : sortable tables
             $cssjs->register_css('clementine-jquery.dataTables', array(
                 'src' => __WWW_ROOT_JQUERYDATATABLES__ . '/skin/css/clementine-dataTables.css'
@@ -2290,9 +2290,9 @@ class crudCrudController extends crudCrudController_Parent
             $cssjs->register_foot('jquery.dataTables', array(
                 'src' => __WWW_ROOT_JQUERYDATATABLES__ . '/skin/js/jquery.dataTables.min.js'
             ));
-            $cssjs->register_foot('clementine_crud-datatables', $this->getBlockHtml($this->_class . '/js_datatables', $this->data, $request));
+            $cssjs->register_foot('clementine_crud-datatables', Clementine::getBlockHtml($this->_class . '/js_datatables', $this->data, $request));
             // alert on delbutton
-            $cssjs->register_foot('clementine_crud-delbutton_confirm', $this->getBlockHtml($this->_class . '/js_delbutton_confirm', $this->data, $request));
+            $cssjs->register_foot('clementine_crud-delbutton_confirm', Clementine::getBlockHtml($this->_class . '/js_delbutton_confirm', $this->data, $request));
         }
     }
 
@@ -2307,7 +2307,7 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function handle_ajax_filtering($champs_recherche, $metas, $params = null)
     {
-        $db = $this->getModel('db');
+        $db = Clementine::getModel('db');
         $filter_where = '';
         $sSearch = "";
         // recupere la search string, considere % et _ comme des caractères normaux, et met * comme joker
@@ -2318,7 +2318,7 @@ class crudCrudController extends crudCrudController_Parent
             $sSearch = str_replace('*', '%', $sSearch);
         }
         if ($sSearch != "") {
-            $ns = $this->getModel('fonctions');
+            $ns = Clementine::getModel('fonctions');
             // boucler sur les champs dans lesquels rechercher -> liste des champs par défaut si non définie
             // pouvoir définir dans quels champs rechercher
             // $metas fields_search

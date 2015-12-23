@@ -1,2 +1,2 @@
 <?php
-$this->getBlock($data['alldata']['class'] . '/update_fields', $data, $request);
+Clementine::getBlock($data['alldata']['class'] . '/update_fields', $data, $request);

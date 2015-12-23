@@ -17,9 +17,9 @@ foreach ($data['fields'] as $tablefield => $fieldMeta) {
     $data['plupload_block'] = array(
         $browseButton => $fieldMeta,
     );
-    $this->getBlock($data['class'] . '/js_plupload_block', $data, $request);
+    Clementine::getBlock($data['class'] . '/js_plupload_block', $data, $request);
 }
-$this->getBlock($data['class'] . '/js_plupload_general', $data, $request);
+Clementine::getBlock($data['class'] . '/js_plupload_general', $data, $request);
 ?>
 
         });

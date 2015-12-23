@@ -1,5 +1,5 @@
 <?php
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     if (array_key_exists($tablefield, $data['ligne'])) { // array_key_exists !== isset
         $val = $data['ligne'][$tablefield];
@@ -21,7 +21,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
             foreach ($reverse_wrappers as $wrapper) {
                 if ($wrapper['opening_block']) {
                     //echo $wrapper['opening_block'] . PHP_EOL;
-                    $this->getBlock($wrapper['opening_block'], $data, $request);
+                    Clementine::getBlock($wrapper['opening_block'], $data, $request);
                 }
             }
         }
@@ -60,8 +60,8 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                 if (isset($data['alldata']['mapping'][$fieldmeta['type']])) {
                     $mapping = $data['alldata']['mapping'][$fieldmeta['type']];
                 }
-                if ($this->canGetBlock($data['alldata']['class'] . '/read_fields/custom_' . $tablefield)) {
-                    $this->getBlock($data['alldata']['class'] . '/read_fields/custom_' . $tablefield, array('tablefield' => $tablefield, 'ligne' => $data['ligne'], 'data' => $data['alldata']), $request);
+                if (Clementine::canGetBlock($data['alldata']['class'] . '/read_fields/custom_' . $tablefield)) {
+                    Clementine::getBlock($data['alldata']['class'] . '/read_fields/custom_' . $tablefield, array('tablefield' => $tablefield, 'ligne' => $data['ligne'], 'data' => $data['alldata']), $request);
                 } else {
                     if ($mapping == 'html') {
                         echo $label_open;
@@ -90,7 +90,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                     'ligne' => $data['ligne'],
                                     'tablefield' => $tablefield
                                 );
-                                $this->getBlock(
+                                Clementine::getBlock(
                                     $data['alldata']['class'] . '/read_file',
                                     array(
                                         'data' => $thisdata,
@@ -125,7 +125,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
             foreach ($wrappers as $wrapper) {
                 if ($wrapper['closing_block']) {
                     //echo $wrapper['closing_block'] . PHP_EOL;
-                    $this->getBlock($wrapper['closing_block'], $data, $request);
+                    Clementine::getBlock($wrapper['closing_block'], $data, $request);
                 }
             }
         }

@@ -1,5 +1,5 @@
 <?php
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 $formtype = 'create';
 if (!empty($data['alldata']['formtype'])) {
     $formtype = $data['alldata']['formtype'];

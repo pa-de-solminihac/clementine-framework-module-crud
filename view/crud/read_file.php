@@ -1,5 +1,5 @@
 <?php
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 $ligne = $data['data']['ligne'];
 $tablefield = $data['data']['tablefield'];
 $this_url = $request->EQUIV[$request->LANG];

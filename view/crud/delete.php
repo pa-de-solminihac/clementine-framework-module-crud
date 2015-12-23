@@ -1,2 +1,2 @@
 <?php
-$this->getBlock($data['class'] . '/errors', $data, $request);
+Clementine::getBlock($data['class'] . '/errors', $data, $request);

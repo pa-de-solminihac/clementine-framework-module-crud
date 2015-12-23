@@ -1,5 +1,5 @@
 <?php
-$ns = $this->getModel('fonctions');
+$ns = Clementine::getModel('fonctions');
 $row = array();
 if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])) {
 ?>
@@ -40,8 +40,8 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                     }
                 }
                 if (!$hidden) {
-                    if ($this->canGetBlock($data['alldata']['class'] . '/index_fields/custom_' . $tablefield)) {
-                        $out = $this->getBlockHtml($data['alldata']['class'] . '/index_fields/custom_' . $tablefield, array(
+                    if (Clementine::canGetBlock($data['alldata']['class'] . '/index_fields/custom_' . $tablefield)) {
+                        $out = Clementine::getBlockHtml($data['alldata']['class'] . '/index_fields/custom_' . $tablefield, array(
                             'tablefield' => $tablefield,
                             'current_key' => $data['current_key'],
                             'ligne' => $data['ligne'],
@@ -111,7 +111,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
     }
 }
 if (empty($data['alldata']['hidden_sections']['actions'])) {
-    $out = $this->getBlockHtml($data['alldata']['class'] . '/index_actions', array(
+    $out = Clementine::getBlockHtml($data['alldata']['class'] . '/index_actions', array(
         'current_key' => $data['current_key'],
         'ligne' => $data['ligne'],
         'alldata' => $data['alldata']
