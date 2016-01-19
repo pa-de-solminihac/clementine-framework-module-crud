@@ -12,6 +12,7 @@ $href = $ns->mod_param($this_url, 'file', $tablefield);
 foreach ($data['alldata']['url_parameters'] as $key => $val) {
     $href = $ns->add_param($href, $key, $val, 1);
 }
+$href = $ns->mod_param($href, 'src_filename', '/' . $visible_name);
 $extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
 $is_image = in_array($extension, array('gif', 'jpg', 'jpeg', 'png'));
 if ($is_image) {

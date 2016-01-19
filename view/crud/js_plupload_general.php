@@ -65,6 +65,11 @@
                     // raz du nom de fichier
                     jQuery('#' + dom_file_elem + '-hidden').val('');
                 }
+                // refresh plupload element
+                var uploader_md5 = jQuery('#' + dom_file_elem).attr('data-md5');
+                if (uploader_md5) {
+                    window['uploader_' + uploader_md5].refresh();
+                }
                 return false;
             });
 

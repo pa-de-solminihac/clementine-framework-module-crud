@@ -60,6 +60,12 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
                                 uploader_label_element.attr('for', shim_id);
                             }
                         }
+                        // use callbacks with attribute data-oninit=""
+                        var callback_code;
+                        if (callback_code = jQuery('#<?php echo $browseButton; ?>').attr('data-oninit')) {
+                            var callback_func = new Function('uploader', callback_code);
+                            callback_func(uploader);
+                        }
                     },
                     FilesAdded: function(up, file) {
                         if (!jQuery('#<?php echo $browseButton; ?>-after').length) {
@@ -105,22 +111,23 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
                         var retval = msg.substring(0, 1);
                         if (retval == '0') {
                             var noms = msg.substring(1).split(':');
-                            var temp_name = noms[0];
-                            var orig_name = noms[1];
+                            var temp_filename = noms[0];
+                            var orig_filename = noms[1];
                             jQuery('#<?php echo $browseButton; ?>-infoscontainer').hide();
 <?php
-    $href = __WWW__ . '/' . $data['class'] . '/deletetmpfile?';
+    // url delete
+    $deletetmpfile_href = __WWW__ . '/' . $data['class'] . '/deletetmpfile';
     if (!empty($data['url_parameters'])) {
         foreach ($data['url_parameters'] as $key => $val) {
-            $href = $ns->add_param($href, $key, $val, 1);
+            $deletetmpfile_href = $ns->add_param($deletetmpfile_href, $key, $val, 1);
         }
     }
-    $href = $ns->mod_param($href, 'file', '');
+    $deletetmpfile_href = $ns->mod_param($deletetmpfile_href, 'file', '');
 ?>
-                            jQuery('#<?php echo $browseButton; ?>-after').attr('href', '<?php echo $href; ?>' + temp_name);
-                            jQuery('#<?php echo $browseButton; ?>-after').html('<i class="glyphicon glyphicon-trash"></i> supprimer <em>' + orig_name + '</em>');
+                            jQuery('#<?php echo $browseButton; ?>-after').attr('href', '<?php echo $deletetmpfile_href; ?>' + temp_filename);
+                            jQuery('#<?php echo $browseButton; ?>-after').html('<i class="glyphicon glyphicon-trash"></i> supprimer <em>' + orig_filename + '</em>');
                             // transmision du nom de fichier
-                            jQuery('#<?php echo $browseButton; ?>-hidden').val(temp_name);
+                            jQuery('#<?php echo $browseButton; ?>-hidden').val(temp_filename);
                             // masque le champ upload autrement car le hide() plante le positionnement du flash sous IE
                             jQuery('#<?php echo $browseButton; ?>').css('position', 'absolute');
                             jQuery('#<?php echo $browseButton; ?>').css('zIndex', '-1');
