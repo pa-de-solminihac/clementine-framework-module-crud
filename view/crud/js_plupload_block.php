@@ -45,6 +45,9 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
 <?php
     }
 ?>
+                multipart_params: {
+                    clementine_crud_formId: '<?php echo $data['formId']; ?>',
+                },
                 multi_selection: false,
                 // unique_names: true,
                 url : formurl + '&plupload_field_name=<?php echo $browseButton; ?>',
@@ -69,6 +72,13 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
                     },
                     FilesAdded: function(up, file) {
                         if (!jQuery('#<?php echo $browseButton; ?>-after').length) {
+<?php
+    if (!empty($fieldMeta['parameters']) && $fieldMeta['parameters']['multipart_uploads']) {
+?>
+                            jQuery('#<?php echo $browseButton; ?>').after(' <a href="" id="<?php echo $browseButton; ?>-addfile" class="plupload_addfile clementine_crud-addfile" />');
+<?php
+    }
+?>
                             jQuery('#<?php echo $browseButton; ?>').after(' <a href="" id="<?php echo $browseButton; ?>-after" class="plupload_finished delbutton" />');
                         }
                         jQuery('#<?php echo $browseButton; ?>-after').html("en cours");
@@ -79,6 +89,15 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
                         }
                         plupload_crudform.data('pending_uploads', pending_uploads);
                         uploader_<?php echo $md5BrowseButton; ?>.start();
+                        // masque le champ upload autrement car le hide() plante le positionnement du flash sous IE
+                        jQuery('#<?php echo $browseButton; ?>').css('position', 'absolute');
+                        jQuery('#<?php echo $browseButton; ?>').css('zIndex', '-1');
+                        jQuery('#<?php echo $browseButton; ?>').css('visibility', 'hidden');
+                        jQuery('#<?php echo $browseButton; ?>-uplcontainer > .moxie-shim:first').css('position', 'absolute');
+                        jQuery('#<?php echo $browseButton; ?>-uplcontainer > .moxie-shim:first').css('zIndex', '-2');
+                        //TODO: vérifier si form:first fonctionne toujours depuis la MAJ de plupload... notamment sous IE
+                        jQuery('#<?php echo $browseButton; ?>-uplcontainer > form:first').css('position', 'absolute');
+                        jQuery('#<?php echo $browseButton; ?>-uplcontainer > form:first').css('zIndex', '-2');
                         // use callbacks with attribute data-onadd=""
                         var callback_code;
                         if (callback_code = jQuery('#<?php echo $browseButton; ?>').attr('data-onadd')) {
@@ -122,10 +141,20 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
             $deletetmpfile_href = $ns->add_param($deletetmpfile_href, $key, $val, 1);
         }
     }
+    $deletetmpfile_href = $ns->mod_param($deletetmpfile_href, 'clementine_crud_formId', $data['formId']);
     $deletetmpfile_href = $ns->mod_param($deletetmpfile_href, 'file', '');
 ?>
                             jQuery('#<?php echo $browseButton; ?>-after').attr('href', '<?php echo $deletetmpfile_href; ?>' + temp_filename);
-                            jQuery('#<?php echo $browseButton; ?>-after').html('<i class="glyphicon glyphicon-trash"></i> supprimer <em>' + orig_filename + '</em>');
+                            jQuery('#<?php echo $browseButton; ?>-after').html('<i class="glyphicon glyphicon-trash"></i> supprimer le fichier');
+                            jQuery('#<?php echo $browseButton; ?>-after').show();
+<?php
+    if (!empty($fieldMeta['parameters']) && $fieldMeta['parameters']['multipart_uploads']) {
+?>
+                            jQuery('#<?php echo $browseButton; ?>-addfile').html('<i class="glyphicon glyphicon-plus"></i> ajouter une page');
+                            jQuery('#<?php echo $browseButton; ?>-addfile').show();
+<?php
+    }
+?>
                             // transmision du nom de fichier
                             jQuery('#<?php echo $browseButton; ?>-hidden').val(temp_filename);
                             // masque le champ upload autrement car le hide() plante le positionnement du flash sous IE

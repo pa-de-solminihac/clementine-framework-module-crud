@@ -53,7 +53,7 @@ echo $label_close;
             <a
                 href=""
                 id="<?php echo $fieldClass; ?>-after"
-                class="plupload_finished delbutton"
+                class="clementine_crud-delbutton plupload_finished delbutton"
                 style="display: none; ">
                 <i class="glyphicon glyphicon-trash"></i>
                 supprimer
@@ -65,7 +65,7 @@ echo $label_close;
                 href="<?php echo $read_file_url; ?>"
                 id="<?php echo $fieldClass; ?>-getfile"
                 target="_blank"
-                class="plupload_getfile">
+                class="clementine_crud-getbutton plupload_getfile">
                 <i class="glyphicon glyphicon-eye-open"></i>
                 voir <em><?php echo $visiblename; ?></em>
             </a>

@@ -55,6 +55,11 @@ class crudCrudController extends crudCrudController_Parent
     );
 
     /**
+     * formId : id aléatoire pour les formulaires générés
+     */
+    public $formId;
+
+    /**
      * _class : nom de la classe instanciée
      */
     protected $_class;
@@ -102,6 +107,8 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function __construct($request, $params = null)
     {
+        $this->formId = uniqid();
+        $this->data['formId'] = $this->formId;
         $class = strtolower(substr(get_class($this), 0, -10));
         $this->_class = $class;
         //cette classe est destinee a etre surchargee elle ne doit servir a rien sinon !
@@ -344,6 +351,7 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function createAction($request, $params = null)
     {
+        $config = $this->getModuleConfig();
         $this->need_privileges($request, $params);
         $this->need_privileges_create_or_update($request, $params);
         $ns = $this->getModel('fonctions');
@@ -407,6 +415,14 @@ class crudCrudController extends crudCrudController_Parent
                         $distincts = $db->distinct_values($ref_table, $ref_field);
                     }
                     $this->setFieldValues($tablefield, $distincts);
+                }
+            }
+        }
+        // get multipart_uploads default value from config file
+        foreach ($this->data['fields'] as $tablefield => $fieldmeta) {
+            if (!empty($this->data['fields'][$tablefield]['type']) && ($this->data['fields'][$tablefield]['type'] == 'file')) {
+                if (!isset($this->data['fields'][$tablefield]['parameters']['multipart_uploads'])) {
+                    $this->data['fields'][$tablefield]['parameters']['multipart_uploads'] = $config['multipart_uploads'];
                 }
             }
         }
@@ -637,6 +653,7 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function updateAction($request, $params = null)
     {
+        $config = $this->getModuleConfig();
         $this->need_privileges($request, $params);
         $this->need_privileges_create_or_update($request, $params);
         // cette classe est destinee a etre surchargee, elle ne doit servir a rien sinon !
@@ -698,6 +715,14 @@ class crudCrudController extends crudCrudController_Parent
                         $distincts = $db->distinct_values($ref_table, $ref_field);
                     }
                     $this->setFieldValues($tablefield, $distincts);
+                }
+            }
+        }
+        // get multipart_uploads default value from config file
+        foreach ($this->data['fields'] as $tablefield => $fieldmeta) {
+            if (!empty($this->data['fields'][$tablefield]['type']) && ($this->data['fields'][$tablefield]['type'] == 'file')) {
+                if (!isset($this->data['fields'][$tablefield]['parameters']['multipart_uploads']) && $config['multipart_uploads']) {
+                    $this->data['fields'][$tablefield]['parameters']['multipart_uploads'] = $config['multipart_uploads'];
                 }
             }
         }
@@ -793,13 +818,29 @@ class crudCrudController extends crudCrudController_Parent
         if ($filename == '.htaccess') {
             die();
         }
-        $sesskey = false;
-        if (isset($_SESSION['crud_uploaded_files'])) {
-            $sesskey = array_search($filename, $_SESSION['crud_uploaded_files']);
+        $index = false;
+        $fileSessionKey = false;
+        $formId = $request->get('string', 'clementine_crud_formId');
+        $session_crud_uploaded_files = 'crud_uploaded_files';
+        if (!empty($params['crud_uploaded_files'])) {
+            $session_crud_uploaded_files = $params['crud_uploaded_files'];
         }
-        if ($sesskey !== false) {
-            unlink(__FILES_ROOT__ . '/tmp/' . $filename);
-            unset($_SESSION['crud_uploaded_files'][$sesskey]);
+        if (!empty($_SESSION[$session_crud_uploaded_files][$formId])) {
+            foreach ($_SESSION[$session_crud_uploaded_files][$formId] as $field => $fieldFiles) {
+                $fileSessionKey = array_search($filename, $fieldFiles);
+                if ($fileSessionKey !== false) {
+                    break;
+                }
+            }
+            // si le fichier demandé est trouvé, on vide tous les fichiers correspondant à ce slot (pas le fichier seul)
+            if ($fileSessionKey !== false) {
+                foreach ($_SESSION[$session_crud_uploaded_files][$formId][$field] as $tmpfile) {
+                    if (file_exists(__FILES_ROOT__ . '/tmp/' . $tmpfile)) {
+                        unlink(__FILES_ROOT__ . '/tmp/' . $tmpfile);
+                    }
+                }
+                $_SESSION[$session_crud_uploaded_files][$formId][$field] = array();
+            }
         }
         return $this->dontGetBlock();
     }
@@ -1853,8 +1894,12 @@ class crudCrudController extends crudCrudController_Parent
         $ns = $this->getModel('fonctions');
         // determine upload_max_filesize
         $default_upload_max_filesize = $ns->get_max_filesize();
-        if (!isset($_SESSION['crud_uploaded_files'])) {
-            $_SESSION['crud_uploaded_files'] = array();
+        $session_crud_uploaded_files = 'crud_uploaded_files';
+        if (!empty($params['crud_uploaded_files'])) {
+            $session_crud_uploaded_files = $params['crud_uploaded_files'];
+        }
+        if (!isset($_SESSION[$session_crud_uploaded_files])) {
+            $_SESSION[$session_crud_uploaded_files] = array();
         }
         foreach ($this->data['fields'] as $tablefield => $fieldmeta) {
             if (isset($fieldmeta['type']) && $fieldmeta['type'] == 'file') {
@@ -1885,7 +1930,12 @@ class crudCrudController extends crudCrudController_Parent
                         if (!(isset($fieldmeta['parameters']) && isset($fieldmeta['parameters']['extensions']) && count($fieldmeta['parameters']['extensions'])) || in_array($extension_upload, $fieldmeta['parameters']['extensions'])) {
                             if (move_uploaded_file($fileslot['tmp_name'], __FILES_ROOT__ . '/tmp/' . $fullname)) {
                                 // enregistre le fichier dans la liste des fichiers uploadés
-                                $_SESSION['crud_uploaded_files'][] = $fullname;
+                                $request = $this->getRequest();
+                                $formId = $request->post('string', 'clementine_crud_formId');
+                                if (empty($_SESSION[$session_crud_uploaded_files][$formId][$fieldkey])) {
+                                    $_SESSION[$session_crud_uploaded_files][$formId][$fieldkey] = array();
+                                }
+                                $_SESSION[$session_crud_uploaded_files][$formId][$fieldkey][] =$fullname;
                                 // ecrase la valeur postee
                                 $params['post'][$fieldkey . '-hidden'] = $fullname;
                                 if ($is_ajax_upload) {
@@ -1985,11 +2035,39 @@ class crudCrudController extends crudCrudController_Parent
                     $file_changed = 1;
                 }
                 $remove_file = isset($params['post'][$fieldkey_nothidden . '-remove']) && $params['post'][$fieldkey_nothidden . '-remove'] == '1';
+                // cherche en session si plusieurs fichiers sont liés, et si c'est le cas on les joint en un fichier unique : PDF si ce ne sont que des JPG, PNG, PDF...
+                // TODO: faire un ZIP sinon ?
+                $formId = $params['post']['clementine_crud_formId'];
+                $joint_file = null;
+                $session_crud_uploaded_files = 'crud_uploaded_files';
+                if (!empty($params['crud_uploaded_files'])) {
+                    $session_crud_uploaded_files = $params['crud_uploaded_files'];
+                }
+                if (!empty($_SESSION[$session_crud_uploaded_files][$formId][$fieldkey_nothidden]) && count($_SESSION[$session_crud_uploaded_files][$formId][$fieldkey_nothidden]) > 1) {
+                    $images = array();
+                    foreach ($_SESSION[$session_crud_uploaded_files][$formId][$fieldkey_nothidden] as $i => $filename) {
+                        $images[$i] = __FILES_ROOT__ . '/tmp/' . $filename;
+                    }
+                    $pdf = new Imagick($images);
+                    $pdf->setImageFormat('pdf');
+                    $joint_file_uniqid = uniqid();
+                    $joint_file_dir = __FILES_ROOT__ . '/tmp';
+                    $joint_file_basename = 'merge-' . $joint_file_uniqid;
+                    $joint_file_extension = '.pdf';
+                    $joint_file = $joint_file_dir . '/' . $joint_file_basename . $joint_file_extension;
+                    $pdf->writeImages($joint_file, true);
+                }
                 // si le fichier a ete modifie, ou si on demande a le supprimer
                 if ($file_changed || $remove_file) {
-                    if ($file_changed && $val && !rename(__FILES_ROOT__ . '/tmp/' . $val, $destdir . $val)) {
+                    $src_tmpfile_name = $val;
+                    $src_tmpfile_path = __FILES_ROOT__ . '/tmp/' . $val;
+                    if ($joint_file) {
+                        $src_tmpfile_name = $joint_file_basename . $joint_file_extension;
+                        $src_tmpfile_path = $joint_file;
+                    }
+                    if ($file_changed && $src_tmpfile_name && !rename($src_tmpfile_path, $destdir . $src_tmpfile_name)) {
                         $move_errs[] = 'Impossible de déplacer le fichier ' . $tablefield_nothidden . ' vers sa destination. Problème de permissions ?';
-                        $move_errs[] = 'rename(' . __FILES_ROOT__ . '/tmp/' . $val . ', ' . $destdir . $val;
+                        $move_errs[] = 'rename(' . $src_tmpfile_path . ', ' . $destdir . $src_tmpfile_name;
                     } else {
                         // supprime le fichier precedent (sauf si duplication)
                         if (is_array($oldvalues) && array_key_exists($tablefield_nothidden, $oldvalues)) {
@@ -1999,9 +2077,9 @@ class crudCrudController extends crudCrudController_Parent
                                 unlink($previous_file);
                             }
                         }
-                        if ($val && !$remove_file) {
-                            $uploaded_files[$fieldkey_nothidden] = $destdir . $val;
-                            $params['post'][$fieldkey_nothidden] = str_replace(__FILES_ROOT__, '__CLEMENTINE_CONTENUS_WWW_ROOT__', $destdir) . $val;
+                        if ($src_tmpfile_name && !$remove_file) {
+                            $uploaded_files[$fieldkey_nothidden] = $destdir . $src_tmpfile_name;
+                            $params['post'][$fieldkey_nothidden] = str_replace(__FILES_ROOT__, '__CLEMENTINE_CONTENUS_WWW_ROOT__', $destdir) . $src_tmpfile_name;
                         } else {
                             $uploaded_files[$fieldkey_nothidden] = '';
                             $params['post'][$fieldkey_nothidden] = '';
@@ -2012,7 +2090,7 @@ class crudCrudController extends crudCrudController_Parent
                             foreach ($this->data['fields'][$tablefield_nothidden]['parameters']['thumbnails'] as $key => $thumb) {
                                 if (isset($thumb['resize_args']) && count($thumb['resize_args'])) {
                                     $args = $thumb['resize_args'];
-                                    $args['filename'] = $destdir . $val;
+                                    $args['filename'] = $destdir . $src_tmpfile_name;
                                     if (!isset($thumb['dest_dir'])) {
                                         // pas de dossier destination demande, on le determine a partir des dimensions demandees et du dossier destdir d'origine
                                         if (isset($args['canevaswidth']) && isset($args['canevasheight'])) {
@@ -2023,7 +2101,7 @@ class crudCrudController extends crudCrudController_Parent
                                         }
                                     }
                                     $thumb['dest_dir'] = preg_replace('@//*@', '/', $thumb['dest_dir'] . '/'); // securite
-                                    $args['save_filename'] = $thumb['dest_dir'] . $val;
+                                    $args['save_filename'] = $thumb['dest_dir'] . $src_tmpfile_name;
                                     // on cree le dossier de destination de la miniatures
                                     if (!is_dir($thumb['dest_dir'])) {
                                         if (!file_exists($thumb['dest_dir'])) {
@@ -2038,8 +2116,8 @@ class crudCrudController extends crudCrudController_Parent
                         $parametres = $this->data['fields'][$tablefield_nothidden]['parameters'];
                         if (isset($parametres['resize_args']) && count($parametres['resize_args'])) {
                             $args = $parametres['resize_args'];
-                            $args['filename'] = $destdir . $val;
-                            $args['save_filename'] = $destdir . $val;
+                            $args['filename'] = $destdir . $src_tmpfile_name;
+                            $args['save_filename'] = $destdir . $src_tmpfile_name;
                             $ns->img_resize($args);
                         }
                     }
@@ -2047,6 +2125,14 @@ class crudCrudController extends crudCrudController_Parent
                     // on reste sur l'ancienne valeur
                     if (is_array($oldvalues) && array_key_exists($tablefield_nothidden, $oldvalues)) {
                         $params['post'][$fieldkey_nothidden] = $oldvalues[$tablefield_nothidden];
+                    }
+                }
+                // supprime les fichiers temporaires devenus inutiles puisque joints en un PDF
+                if ($joint_file) {
+                    foreach ($images as $filename_to_delete) {
+                        if (file_exists($filename_to_delete)) {
+                            unlink($filename_to_delete);
+                        }
                     }
                 }
             }
