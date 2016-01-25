@@ -73,7 +73,7 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
                     FilesAdded: function(up, file) {
                         if (!jQuery('#<?php echo $browseButton; ?>-after').length) {
 <?php
-    if (!empty($fieldMeta['parameters']) && $fieldMeta['parameters']['multipart_uploads']) {
+    if (!empty($fieldMeta['parameters']['multipart_uploads']) && $fieldMeta['parameters']['multipart_uploads']) {
 ?>
                             jQuery('#<?php echo $browseButton; ?>').after(' <a href="" id="<?php echo $browseButton; ?>-addfile" class="plupload_addfile clementine_crud-addfile" />');
 <?php
@@ -148,7 +148,7 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
                             jQuery('#<?php echo $browseButton; ?>-after').html('<i class="glyphicon glyphicon-trash"></i> supprimer le fichier');
                             jQuery('#<?php echo $browseButton; ?>-after').show();
 <?php
-    if (!empty($fieldMeta['parameters']) && $fieldMeta['parameters']['multipart_uploads']) {
+    if (!empty($fieldMeta['parameters']['multipart_uploads']) && $fieldMeta['parameters']['multipart_uploads']) {
 ?>
                             jQuery('#<?php echo $browseButton; ?>-addfile').html('<i class="glyphicon glyphicon-plus"></i> ajouter une page');
                             jQuery('#<?php echo $browseButton; ?>-addfile').show();
