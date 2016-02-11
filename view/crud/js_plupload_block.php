@@ -110,6 +110,9 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
                         if (pending_uploads < 1) {
                             return undefined;
                         }
+                        if (file.percent) {
+                            jQuery('#<?php echo $browseButton; ?>-after').show();
+                        }
                         jQuery('#<?php echo $browseButton; ?>-after').html(file.percent + "%");
                         jQuery('#<?php echo $browseButton; ?>-after').attr('href', '');
                         // use callbacks with attribute data-onprogress=""
