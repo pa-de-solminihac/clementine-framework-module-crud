@@ -28,18 +28,14 @@ echo $label_close;
 ?> />
             <label
                 for="<?php echo $fieldClass; ?>">
-<?php
-if (!$hasOnsenUI) {
-?>
-<label class="checkbox">
-<?php
-}
-?>
                 <input
                     type="checkbox"
                     id="<?php echo $fieldClass; ?>"
                     name="<?php echo $fieldClass; ?>"
-                    class="<?php echo $valueClasses; ?>"
+<?php
+// $valueClasses_base instead of $valueClasses here, because the 'form-control' CSS class conflicts with the material design theme (bootstrap3material)
+?>
+                    class="<?php echo $valueClasses_base; ?>"
                     value="1" <?php
                 if ($fieldEscapedValue) {
                     echo ' checked="checked" ';
@@ -54,15 +50,6 @@ if (!$hasOnsenUI) {
                     echo ' required ';
                 }
 ?> />
-<?php
-if (!$hasOnsenUI) {
-?>
-<div class="checkbox__checkmark"></div>
-<span class="ons-checkbox-inner"></span>
-</label>
-<?php
-}
-?>
             </label>
         </span>
 <?php
