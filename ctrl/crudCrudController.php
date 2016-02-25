@@ -1535,7 +1535,8 @@ class crudCrudController extends crudCrudController_Parent
     public function setFieldValues($tablefield, $values)
     {
         if (isset($this->data['fields'][$tablefield])) {
-            $this->data['fields'][$tablefield]['fieldvalues'] = $values;
+            $this->data['fields'][$tablefield]['type'] = 'select';
+            $this->data['fields'][$tablefield]['fieldvalues'] = (array) $values;
             return true;
         }
         return false;
