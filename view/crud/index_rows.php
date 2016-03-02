@@ -7,10 +7,12 @@ if (!(isset($data['alldata']['return_json']) && $data['alldata']['return_json'])
 <?php
 }
 if ($data['alldata']['formtype'] != 'none') {
-    $href = __WWW__ . '/' . $data['alldata']['class'] . '/' . $data['alldata']['formtype'] . '?' . $ns->htmlentities($data['current_key']);
     if (isset($data['alldata']['row_url'])) {
-        $href = $data['alldata']['row_url'] . $ns->htmlentities($data['current_key']);
+        $href = $data['alldata']['row_url'];
+    } else {
+        $href = __WWW__ . '/' . $data['alldata']['class'] . '/' . $data['alldata']['formtype'];
     }
+    $href = $ns->add_param($href, $ns->htmlentities($data['current_key']));
     foreach ($data['alldata']['url_parameters'] as $key => $val) {
         $href = $ns->add_param($href, $key, $val, 1);
     }
