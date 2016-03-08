@@ -65,7 +65,11 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                         } else {
                             $out = '';
                             if ($data['alldata']['formtype'] != 'none') {
-                                $out = '<a href="' . $href . '">';
+                                $more_classes_link = array();
+                                if (!empty($data['alldata']['more_classes_link'])) {
+                                    $more_classes_link = $data['alldata']['more_classes_link'];
+                                }
+                                $out = '<a class="' . implode(' ', $more_classes_link) . '" href="' . $href . '">';
                             }
                             switch ($mapping) {
                             case 'checkbox':

@@ -157,6 +157,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->data['more_classes_table'] = array();
         $this->data['more_classes_xlsbutton'] = array();
         $this->data['more_classes_createbutton'] = array();
+        $this->data['more_classes_link'] = array();
         $this->data['button_label_create'] = 'Nouveau';
         $this->data['button_label_xls'] = 'Exporter';
         // autoclick configurable dans le .ini
@@ -932,9 +933,15 @@ class crudCrudController extends crudCrudController_Parent
      */
     public function addClass($type, $class)
     {
-        $this->data[$type] = array_merge($this->data[$type], array(
-            $class => $class
-        ));
+        if (isset($this->data[$type])) {
+            $this->data[$type] = array_merge($this->data[$type], array(
+                $class => $class
+            ));
+        } else {
+            $this->data[$type] = array(
+                $class => $class
+            );
+        }
     }
 
     /**
