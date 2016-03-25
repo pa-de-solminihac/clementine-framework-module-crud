@@ -129,13 +129,13 @@
                 }
                 jQuery('#' + this_id).html('');
                 jQuery('#' + dom_file_elem).show();
+                jQuery('#' + dom_file_elem + '-addfile').hide();
                 jQuery('#' + dom_file_elem + '-after').hide();
-                // TODO: triggering click on plupload shim does not work in IE
-                var isIE = /(MSIE|Trident\/|Edge\/)/i.test(navigator.userAgent);
-                if (!isIE) {
-                    var shim_selector = '#' + dom_file_elem + '-uplcontainer > .moxie-shim input[type=file]:first';
-                    jQuery(shim_selector).trigger('click');
-                }
+                var shim_selector = '#' + dom_file_elem + '-uplcontainer > .moxie-shim input[type=file]:first-child';
+                var ev = document.createEvent("Events");
+                ev.initEvent("click", true, false);
+                var element = document.querySelector(shim_selector);
+                element.dispatchEvent(ev);
                 // consequence de : "masque le champ upload autrement car le hide() plante le positionnement du flash sous IE"
                 jQuery('#' + dom_file_elem).css('position', 'relative');
                 jQuery('#' + dom_file_elem).css('zIndex', '1');
