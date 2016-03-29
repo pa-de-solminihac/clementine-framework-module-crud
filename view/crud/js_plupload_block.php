@@ -76,6 +76,7 @@ foreach ($data['plupload_block'] as $browseButton => $fieldMeta) {
     if (!empty($fieldMeta['parameters']['multipart_uploads']) && $fieldMeta['parameters']['multipart_uploads']) {
 ?>
                             jQuery('#<?php echo $browseButton; ?>').after(' <a href="" id="<?php echo $browseButton; ?>-addfile" class="plupload_addfile clementine_crud-addfile" />');
+                            jQuery('#<?php echo $browseButton; ?>-addfile').hide();
 <?php
     }
 ?>
