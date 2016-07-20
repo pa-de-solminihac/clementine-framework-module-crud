@@ -454,8 +454,16 @@ class crudCrudController extends crudCrudController_Parent
                 if (!isset($params['dont_start_transaction'])) {
                     $params['dont_start_transaction'] = false;
                 }
+                $module_name = $this->getCurrentModule();
+                $err = $this->getHelper('errors');
+                $err->flush($module_name);
                 if (!$last_insert_ids = $this->_crud->create($params['post'], $params)) {
-                    $errors[] = 'erreur rencontree lors de la creation';
+                    $create_errors = $err->get($module_name, 'create');
+                    $errmsg = 'erreur rencontree lors de la creation';
+                    if (__DEBUGABLE__ && Clementine::$config['clementine_debug']['display_errors']) {
+                        $errmsg .= ' : ' . print_r($create_errors, true);
+                    }
+                    $errors[] = $errmsg;
                 } else {
                     if (!isset($params['url_retour'])) {
                         $query_string = array();
@@ -467,6 +475,7 @@ class crudCrudController extends crudCrudController_Parent
                         $params['url_retour'] = __WWW__ . '/' . $this->_class . '/index?' . http_build_query($query_string);
                     }
                 }
+                $err->flush($module_name);
             } else {
                 $errors = array_merge($errors, $validate_errs);
             }
