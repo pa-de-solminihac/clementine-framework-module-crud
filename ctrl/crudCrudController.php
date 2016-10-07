@@ -1934,7 +1934,9 @@ class crudCrudController extends crudCrudController_Parent
                     $fileslot = $_FILES['file'];
                     $is_ajax_upload = 1;
                     // pour eviter de voir le div de debug ressortir dans les messages d'erreur ajax quand le debug est active
-                    define('__NO_DEBUG_DIV__', 1);
+                    if (!defined('__NO_DEBUG_DIV__')) {
+                        define('__NO_DEBUG_DIV__', true);
+                    }
                 }
                 if (isset($fileslot['name'])) {
                     if ((isset($fieldmeta['parameters']) && (isset($fieldmeta['parameters']['max_filesize']) && $fileslot['size'] <= $fieldmeta['parameters']['max_filesize'])) || ($fileslot['size'] <= $default_upload_max_filesize)) {

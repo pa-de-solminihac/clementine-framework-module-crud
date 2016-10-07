@@ -77,7 +77,7 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
 foreach ($firstrow as $tablefield => $val) {
     $fieldmeta = $data['fields'][$tablefield];
     $field_name = $tablefield;
-    $field_class = $tablefield;
+    $field_class = str_replace('.', '-', $tablefield);
     if ($fieldmeta['type'] != 'custom_field' && strpos($tablefield, '.')) {
         list ($table, $field) = explode('.', $tablefield, 2);
         $field_class = $table . '-' . $field;
@@ -91,7 +91,7 @@ foreach ($firstrow as $tablefield => $val) {
 ?>
     <col class="clementine_crud-list_table_col_<?php echo $field_class; ?>" style="<?php
     if ($config['table_layout_fixed']) {
-        echo 'width: ' . $firstrow[$tablefield]['calculated_width'] . '%';
+        echo 'min-width: ' . $firstrow[$tablefield]['calculated_width'] . '%';
     } ?>" />
 <?php
     }
@@ -113,7 +113,7 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
     foreach ($firstrow as $tablefield => $val) {
         $fieldmeta = $data['fields'][$tablefield];
         $field_name = $tablefield;
-        $field_class = $tablefield;
+        $field_class = str_replace('.', '-', $tablefield);
         if ($fieldmeta['type'] != 'custom_field' && strpos($tablefield, '.')) {
             list ($table, $field) = explode('.', $tablefield, 2);
             $field_class = $table . '-' . $field;
@@ -124,16 +124,15 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
             $hidden = 1;
         }
         if (!$hidden) {
-?>
-            <th class="clementine_crud-list_table_th_<?php echo $field_class; ?>">
-<?php
+            $column_title = ucfirst(preg_replace('/[_-]+/', ' ', $field_name));
             if (isset($data['metas']['title_mapping'][$tablefield])) {
-                echo $data['metas']['title_mapping'][$tablefield];
-            } else {
-                echo ucfirst(preg_replace('/[_-]+/', ' ', $field_name));
+                $column_title = $data['metas']['title_mapping'][$tablefield];
             }
 ?>
-            </th>
+                <th
+                    class="clementine_crud-list_table_th_<?php echo $field_class; ?>"
+                    title="<?php echo $column_title; ?>"
+                ><?php echo $column_title; ?></th>
 <?php
         }
     }
