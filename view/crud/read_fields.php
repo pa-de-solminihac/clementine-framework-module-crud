@@ -54,8 +54,15 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                 $valueclasses = 'clementine_crud-' . $data['alldata']['formtype'] . '-value_column ';
                 $valueclasses.= 'clementine_crud-' . $data['alldata']['formtype'] . '_type-' . $fieldmeta['type'];
                 $valueclasses.= ' ' . implode(' ', $data['alldata']['more_classes_field_val']) . ' ';
-                $div_open = '<div id="' .  $field_class . '" class="' . $valueclasses . ' ">'; 
+                $div_open = '<div id="' .  $field_class . '" class="' . $valueclasses . ' ">';
                 $div_close = '</div>';
+                $data['alldata']['label_open'] = $label_open;
+                $data['alldata']['label_close'] = $label_close;
+                $data['alldata']['div_open'] = $div_open;
+                $data['alldata']['div_close'] = $div_close;
+                $data['alldata']['ligne'] = $data['ligne'];
+                $data['alldata']['tablefield'] = $tablefield;
+                $data['alldata']['fieldmeta'] = $fieldmeta;
                 $mapping = '';
                 if (isset($data['alldata']['mapping'][$fieldmeta['type']])) {
                     $mapping = $data['alldata']['mapping'][$fieldmeta['type']];
@@ -64,41 +71,18 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                     $this->getBlock($data['alldata']['class'] . '/read_fields/custom_' . $tablefield, array('tablefield' => $tablefield, 'ligne' => $data['ligne'], 'data' => $data['alldata']), $request);
                 } else {
                     if ($mapping == 'html') {
-                        echo $label_open;
-                        echo $label_close;
-                        echo $div_open;
-                        echo $data['ligne'][$tablefield];
-                        echo $div_close;
+                        $real_mapping = $mapping;
+                        $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
                     } else {
                         switch ($mapping) {
                             case 'checkbox':
-                                echo $label_open;
-                                echo $label_close;
-                                echo $div_open;
-                                if ($data['ligne'][$tablefield]) {
-                                    echo '✓';
-                                } else {
-                                    echo '✕';
-                                }
-                                echo $div_close;
+                                $real_mapping = 'checkbox';
+                                $this->getBlock($data['alldata']['class'] . '/read_fields/' . $real_mapping, $data['alldata'], $request);
                                 break;
                             case 'file':
-                                echo $label_open;
-                                echo $label_close;
-                                echo $div_open;
-                                $thisdata = array(
-                                    'ligne' => $data['ligne'],
-                                    'tablefield' => $tablefield
-                                );
-                                $this->getBlock(
-                                    $data['alldata']['class'] . '/read_file',
-                                    array(
-                                        'data' => $thisdata,
-                                        'alldata' => $data['alldata']
-                                    ),
-                                    $request
-                                );
-                                echo $div_close;
+                                $real_mapping = $mapping;
+                                $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
+                                break;
                                 break;
                             default:
                                 echo $label_open;
