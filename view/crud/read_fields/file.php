@@ -7,10 +7,10 @@ $thisdata = array(
     'tablefield' => $data['tablefield']
 );
 $this->getBlock(
-    $data['alldata']['class'] . '/read_file',
+    $data['class'] . '/read_file',
     array(
         'data' => $thisdata,
-        'alldata' => $data['alldata']
+        'alldata' => $data,
     ),
     $request
 );

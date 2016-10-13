@@ -72,7 +72,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                 } else {
                     if ($mapping == 'html') {
                         $real_mapping = $mapping;
-                        $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
+                        $this->getBlock($data['alldata']['class'] . '/read_fields/' . $real_mapping, $data['alldata'], $request);
                     } else {
                         switch ($mapping) {
                             case 'checkbox':
@@ -81,8 +81,7 @@ foreach ($data['alldata']['fields'] as $tablefield => $metas) {
                                 break;
                             case 'file':
                                 $real_mapping = $mapping;
-                                $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
-                                break;
+                                $this->getBlock($data['alldata']['class'] . '/read_fields/' . $real_mapping, $data['alldata'], $request);
                                 break;
                             default:
                                 echo $label_open;
