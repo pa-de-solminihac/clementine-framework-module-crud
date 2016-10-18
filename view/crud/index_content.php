@@ -131,7 +131,7 @@ if (!(isset($data['return_json']) && $data['return_json'])) {
 ?>
                 <th
                     class="clementine_crud-list_table_th_<?php echo $field_class; ?>"
-                    title="<?php echo $column_title; ?>"
+                    title="<?php echo $ns->strip_tags($column_title); ?>"
                 ><?php echo $column_title; ?></th>
 <?php
         }
