@@ -257,7 +257,7 @@ class crudCrudController extends crudCrudController_Parent
                     if (isset($champs_affiches[(int)$params['get']['iSortCol_' . $i]]) && isset($sort_ways[$params['get']['sSortDir_' . $i]])) {
                         $sort_field = $champs_affiches[(int)$params['get']['iSortCol_' . $i]];
                         $sort_way = $sort_ways[$params['get']['sSortDir_' . $i]];
-                        $order = $sort_field . ' ' . $sort_way;
+                        $order = '`' . $sort_field . '` ' . $sort_way;
                         if (isset($this->data['metas']['custom_order_by'][$sort_field]) && isset($this->data['metas']['custom_order_by'][$sort_field][$sort_way])) {
                             $order = $this->data['metas']['custom_order_by'][$sort_field][$sort_way];
                         }
@@ -2032,6 +2032,10 @@ class crudCrudController extends crudCrudController_Parent
                 if (!is_dir($destdir)) {
                     if (!file_exists($destdir)) {
                         mkdir($destdir, 0777, true);
+                    }
+                    // ensure default destdir is protected by .htaccess
+                    if (!file_exists(__FILES_ROOT__ . '/files/app/.htaccess')) {
+                        file_put_contents(__FILES_ROOT__ . '/files/app/.htaccess', 'RewriteEngine On' . PHP_EOL . 'RewriteRule .* ../../index.php [L]');
                     }
                 }
                 // lors d'un create, on ignore cette etape puisqu'on n'a pas encore d'id sur lequel faire le lien
