@@ -26,6 +26,7 @@
                 var fin_chaine = parseInt(this_id.length - '-after'.length);
                 var dom_file_elem = this_id.substring(0, fin_chaine);
                 if (this_href) {
+                    jQuery(this).attr('href', null);
                     jQuery.ajax({
                         url: this_href,
                         async: true,
