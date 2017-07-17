@@ -27,12 +27,19 @@ class crudCrudController extends crudCrudController_Parent
         'smallint'     => 'number',
         'mediumint'    => 'number',
         'bigint'       => 'number',
+        'decimal'      => 'number',
+        'double'       => 'number',
+        'float'        => 'number',
+        'numeric'      => 'number',
+        'year'         => 'number',
         'textarea'     => 'textarea',
         'tinytext'     => 'textarea',
         'text'         => 'textarea', // le type SQL "text" => textarea, si on veut un input type="text" on peut choisir le type "input"
-        'input'        => 'text',
         'mediumtext'   => 'textarea',
         'longtext'     => 'textarea',
+        'input'        => 'text',
+        'char'         => 'text',
+        'varchar'      => 'text',
         'password'     => 'password',
         'tel'          => 'tel',
         'url'          => 'url',
@@ -44,7 +51,6 @@ class crudCrudController extends crudCrudController_Parent
         'time'         => 'time',
         'month'        => 'month',
         'week'         => 'week',
-        'number'       => 'number',
         'range'        => 'range',
         'color'        => 'color',
         'radio'        => 'radio',
@@ -77,6 +83,12 @@ class crudCrudController extends crudCrudController_Parent
         'url_parameters' => array(),
         'autoload_foreign_keys_values' => false,
     );
+
+
+    public function setForeignKeyLabels($referenced_table, $id_field, $label_field)
+    {
+        $this->_crud->metas['keys_labels'][$referenced_table . '.' . $id_field] = $label_field;
+    }
 
     public function setOption($key, $val)
     {
@@ -284,6 +296,7 @@ class crudCrudController extends crudCrudController_Parent
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
+                    // set id => label with $this->setForeignKeyLabels(ref_table, id_field, label_field);
                     if (!empty($this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field])) {
                         $distincts = $db->distinct_values($ref_table, $ref_field, $this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field]);
                     } else {
@@ -410,6 +423,7 @@ class crudCrudController extends crudCrudController_Parent
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
+                    // set id => label with $this->setForeignKeyLabels(ref_table, id_field, label_field);
                     if (!empty($this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field])) {
                         $distincts = $db->distinct_values($ref_table, $ref_field, $this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field]);
                     } else {
@@ -576,6 +590,7 @@ class crudCrudController extends crudCrudController_Parent
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
+                    // set id => label with $this->setForeignKeyLabels(ref_table, id_field, label_field);
                     if (!empty($this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field])) {
                         $distincts = $db->distinct_values($ref_table, $ref_field, $this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field]);
                     } else {
@@ -626,10 +641,6 @@ class crudCrudController extends crudCrudController_Parent
             }
             $this->trigger404();
         }
-        // charge les valeurs pour les clés étrangères
-        //if ($this->getOption('autoload_foreign_keys_values')) {
-            //TODO: (code obsolète supprimé)
-        //}
         // affiche le fichier demande avec les memes droits que l'objet
         $ns = $this->getModel('fonctions');
         $tablefield = $ns->ifGet('string', 'file');
@@ -719,6 +730,7 @@ class crudCrudController extends crudCrudController_Parent
             foreach ($this->_crud->fields as $tablefield => $fieldmeta) {
                 if (isset($this->_crud->metas['foreign_keys'][$tablefield])) {
                     list($ref_table, $ref_field) = explode('.', $this->_crud->metas['foreign_keys'][$tablefield]);
+                    // set id => label with $this->setForeignKeyLabels(ref_table, id_field, label_field);
                     if (!empty($this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field])) {
                         $distincts = $db->distinct_values($ref_table, $ref_field, $this->_crud->metas['keys_labels'][$ref_table . '.' . $ref_field]);
                     } else {
@@ -1243,6 +1255,7 @@ class crudCrudController extends crudCrudController_Parent
      *            dans la génération des formulaires
      *            utile pour rajouter des champs calcules dans la page listing
      *            utilisable depuis le hook add_fields
+     *            block surchargeable en préfixant le nom de fichier par "custom_"
      *
      * @param mixed $tablefield : nom du champ virtuel sous la forme $table.$field
      * @param mixed $before_tablefield : champ $table.$field avant lequel positionner le champ

@@ -78,7 +78,7 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
 
         $doDisplayValues = empty($data['alldata']['hidden_sections']['values']);
         if ($doDisplayValues) {
-            $valueDivClasses = 'clementine_crud-value_column clementine_crud-' . $formType . '-value_column ' . $fieldClass . '-value_column ';
+            $valueDivClasses = 'clementine_crud-type-' . $mapping . ' clementine_crud-value_column clementine_crud-' . $formType . '-value_column ' . $fieldClass . '-value_column ';
             $valueDivClasses.= implode(' ', $data['alldata']['more_classes_field_val_div']) . ' ';
             $valueClasses_base = 'clementine_crud-type-' . $mapping . ' clementine_crud-' . $formType . '_type-' . $mapping . ' ' . $fieldClass . '-value_field ';
             $valueClasses = $valueClasses_base . implode(' ', $data['alldata']['more_classes_field_val']) . ' ';
@@ -160,10 +160,10 @@ foreach ($data['alldata']['fields'] as $tableField => $fieldMeta) {
                 break;
 
             default:
-                if (!isset($fieldMeta['fieldvalues'])/* || $mapping == 'span'*/) {
-                    break;
-                }
                 $real_mapping = 'default';
+                if (!isset($fieldMeta['fieldvalues'])/* || $mapping == 'span'*/) {
+                    $real_mapping = 'html5';
+                }
                 $this->getBlock($data['alldata']['class'] . '/update_fields/' . $real_mapping, $alldata, $request);
                 break;
             }
