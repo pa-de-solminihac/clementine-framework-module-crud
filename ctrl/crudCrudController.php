@@ -541,7 +541,7 @@ class crudCrudController extends crudCrudController_Parent
         $this->merge_values($to_merge);
         $this->merge_added_fields($params);
         $this->alter_values($request, $params);
-        $this->alter_values_create_or_update($request, $request, $params);
+        $this->alter_values_create_or_update($request, $params);
         if (!isset($params['dont_handle_errors'])) {
             $params['dont_handle_errors'] = false;
         }
