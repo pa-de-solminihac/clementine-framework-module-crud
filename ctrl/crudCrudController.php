@@ -2109,7 +2109,7 @@ class crudCrudController extends crudCrudController_Parent
                         if (is_array($oldvalues) && array_key_exists($tablefield_nothidden, $oldvalues)) {
                             $previous_file = str_replace('__CLEMENTINE_CONTENUS_WWW_ROOT__', __FILES_ROOT__, $oldvalues[$tablefield_nothidden]);
                             // on ne touche pas aux fichiers précédents lors d'une duplication !
-                            if ($previous_file && is_file($previous_file) && empty($params['duplicate']) && empy($params['keep_files'])) {
+                            if ($previous_file && is_file($previous_file) && empty($params['duplicate']) && empty($params['keep_files'])) {
                                 unlink($previous_file);
                             }
                         }
